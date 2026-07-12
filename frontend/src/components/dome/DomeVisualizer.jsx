@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Grid, PerspectiveCamera, Html } from "@react-three/drei";
 import * as THREE from "three";
@@ -46,7 +46,6 @@ function SkyDome() {
 import {
   hemisphereProfile,
   semiEllipsoidProfile,
-  slurryCapProfile,
   buildLathe,
 } from "../../utils/geometry";
 
@@ -107,104 +106,7 @@ function RectangleDomeMesh({ length, width, wallHeight }) {
   );
 }
 
-/* ── Rectangle slurry fill (straight prism up to slurryHeight) ─*/
-function RectangleSlurryMesh({ length, width, slurryHeight }) {
-  const geometry = useMemo(() => {
-    if (slurryHeight <= 0) return null;
-    const g = new THREE.BoxGeometry(length, slurryHeight, width);
-    g.translate(0, slurryHeight / 2, 0);
-    return g;
-  }, [length, width, slurryHeight]);
 
-  if (!geometry) return null;
-
-  return (
-    <mesh geometry={geometry}>
-      <meshPhysicalMaterial
-        color="#00a35c"
-        transparent
-        opacity={0.55}
-        roughness={0.2}
-        metalness={0}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-}
-
-/* ── Rectangle slurry surface plane (top face) ────────────────*/
-function RectangleSlurrySurface({ length, width, slurryHeight }) {
-  if (slurryHeight <= 0) return null;
-  return (
-    <mesh position={[0, slurryHeight, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[length, width]} />
-      <meshPhysicalMaterial
-        color="#00ed64"
-        transparent
-        opacity={0.45}
-        roughness={0.05}
-        metalness={0.1}
-      />
-    </mesh>
-  );
-}
-
-/* ── Rectangle base plate ──────────────────────────────────────*/
-function RectangleBase({ length, width }) {
-  return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
-      <planeGeometry args={[length + 0.1, width + 0.1]} />
-      <meshBasicMaterial color="#001e2b" transparent opacity={0.15} />
-    </mesh>
-  );
-}
-
-/* ── Slurry cap (circular) ─────────────────────────────────────*/
-function SlurryMesh({ radius, domeHeight, slurryHeight }) {
-  const geometry = useMemo(() => {
-    const profile = slurryCapProfile("semiEllipsoid", radius, domeHeight, slurryHeight);
-    return buildLathe(profile, 80);
-  }, [radius, domeHeight, slurryHeight]);
-
-  if (!geometry || slurryHeight <= 0) return null;
-
-  return (
-    <mesh geometry={geometry}>
-      <meshPhysicalMaterial
-        color="#00a35c"
-        transparent
-        opacity={0.55}
-        roughness={0.2}
-        metalness={0}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-}
-
-/* ── Slurry surface plane (top face, circular) ────────────────*/
-function SlurrySurface({ radius, domeHeight, slurryHeight }) {
-  const surfaceRadius = useMemo(() => {
-    if (slurryHeight <= 0) return 0;
-    const a = radius, b = domeHeight > 0 ? domeHeight : radius;
-    return a * Math.sqrt(Math.max(0, 1 - (slurryHeight / b) ** 2));
-  }, [radius, domeHeight, slurryHeight]);
-
-  if (slurryHeight <= 0 || surfaceRadius <= 0) return null;
-
-  return (
-    <mesh position={[0, slurryHeight, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <circleGeometry args={[surfaceRadius, 80]} />
-      <meshPhysicalMaterial
-        color="#00ed64"
-        transparent
-        opacity={0.45}
-        roughness={0.05}
-        metalness={0.1}
-      />
-    </mesh>
-  );
-}
 
 /* ── Base ring (concrete footing at dome base) ────────────────*/
 function BaseRing({ radius }) {
@@ -216,30 +118,66 @@ function BaseRing({ radius }) {
   );
 }
 
-/* ── Human scale reference (simple 2m silhouette) ─────────────*/
+/* ── Human scale reference (simple blocky humanoid) ─────────────*/
 function PersonScale({ x = 0, z = 0, height = 2 }) {
-  const headRadius = height * 0.065;
-  const bodyHeight = height - headRadius * 2;
-  const bodyTopRadius = height * 0.09;
-  const bodyBottomRadius = height * 0.12;
+  // Proportions based on total height
+  const headR = height * 0.065;
+  const torsoW = height * 0.22;
+  const torsoH = height * 0.35;
+  const torsoD = height * 0.12;
+  const legW = height * 0.08;
+  const legH = height - (headR * 2) - torsoH;
+  const legD = height * 0.1;
+  const armW = height * 0.06;
+  const armH = height * 0.38;
+  const armD = height * 0.08;
+
+  const headY = height - headR;
+  const torsoY = legH + torsoH / 2;
+  const legY = legH / 2;
+  const armY = legH + torsoH - armH / 2 - (height * 0.02);
+
+  const mat = <meshStandardMaterial color="#33414d" roughness={0.8} />;
 
   return (
     <group position={[x, 0, z]}>
-      {/* body */}
-      <mesh position={[0, bodyHeight / 2, 0]} castShadow>
-        <cylinderGeometry args={[bodyTopRadius, bodyBottomRadius, bodyHeight, 16]} />
-        <meshStandardMaterial color="#33414d" roughness={0.8} />
+      {/* Head */}
+      <mesh position={[0, headY, 0]} castShadow>
+        <sphereGeometry args={[headR, 16, 16]} />
+        {mat}
       </mesh>
-      {/* head */}
-      <mesh position={[0, bodyHeight + headRadius, 0]} castShadow>
-        <sphereGeometry args={[headRadius, 16, 16]} />
-        <meshStandardMaterial color="#33414d" roughness={0.8} />
+      {/* Torso */}
+      <mesh position={[0, torsoY, 0]} castShadow>
+        <boxGeometry args={[torsoW, torsoH, torsoD]} />
+        {mat}
       </mesh>
+      {/* Left Arm */}
+      <mesh position={[-torsoW/2 - armW/2 - 0.02, armY, 0]} castShadow>
+        <boxGeometry args={[armW, armH, armD]} />
+        {mat}
+      </mesh>
+      {/* Right Arm */}
+      <mesh position={[torsoW/2 + armW/2 + 0.02, armY, 0]} castShadow>
+        <boxGeometry args={[armW, armH, armD]} />
+        {mat}
+      </mesh>
+      {/* Left Leg */}
+      <mesh position={[-torsoW/4, legY, 0]} castShadow>
+        <boxGeometry args={[legW, legH, legD]} />
+        {mat}
+      </mesh>
+      {/* Right Leg */}
+      <mesh position={[torsoW/4, legY, 0]} castShadow>
+        <boxGeometry args={[legW, legH, legD]} />
+        {mat}
+      </mesh>
+      
       {/* ground marker */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-        <circleGeometry args={[bodyBottomRadius * 1.4, 24]} />
+        <circleGeometry args={[torsoW * 1.2, 24]} />
         <meshBasicMaterial color="#001e2b" transparent opacity={0.2} />
       </mesh>
+      
       {/* height label */}
       <Html position={[0, height + 0.25, 0]} center distanceFactor={10} occlude={false}>
         <div
@@ -331,18 +269,17 @@ function Scene({ calc, params }) {
         {isRectangle ? (
           <>
             <RectangleDomeMesh length={calc.length} width={calc.width} wallHeight={calc.wallHeight} />
-            <RectangleSlurryMesh length={calc.length} width={calc.width} slurryHeight={calc.slurryHeight} />
-            <RectangleSlurrySurface length={calc.length} width={calc.width} slurryHeight={calc.slurryHeight} />
-            <RectangleBase length={calc.length} width={calc.width} />
-            <PersonScale x={0} z={calc.width / 2 + 0.6} height={2} />
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
+              <planeGeometry args={[calc.length + 0.1, calc.width + 0.1]} />
+              <meshBasicMaterial color="#001e2b" transparent opacity={0.15} />
+            </mesh>
+            {params.showPerson !== false && <PersonScale x={0} z={calc.width / 2 + 0.6} height={2} />}
           </>
         ) : (
           <>
             <DomeMesh     radius={calc.radius} domeHeight={calc.domeHeight} />
-            <SlurryMesh   radius={calc.radius} domeHeight={calc.domeHeight} slurryHeight={calc.slurryHeight} />
-            <SlurrySurface radius={calc.radius} domeHeight={calc.domeHeight} slurryHeight={calc.slurryHeight} />
             <BaseRing     radius={calc.radius} />
-            <PersonScale x={calc.radius + 0.6} z={0} height={2} />
+            {params.showPerson !== false && <PersonScale x={calc.radius + 0.6} z={0} height={2} />}
           </>
         )}
       </group>
@@ -377,8 +314,28 @@ function Scene({ calc, params }) {
 
 /* ── Main export ─────────────────────────────────────────────*/
 export default function DomeVisualizer({ calc, params }) {
+  const containerRef = useRef(null);
+
+  // Fallback cleanup in case component unmounts while hovered
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    document.body.style.overflow = "hidden";
+  };
+
+  const handleMouseLeave = () => {
+    document.body.style.overflow = "auto";
+  };
+
   return (
     <div
+      ref={containerRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       style={{
         width: "100%",
         height: "100%",
@@ -388,6 +345,7 @@ export default function DomeVisualizer({ calc, params }) {
         border: "1px solid #e1e5e8",
         backgroundColor: "#f9fbfa",
         position: "relative",
+        touchAction: "none",
       }}
     >
       <Canvas shadows gl={{ antialias: true, alpha: false }} style={{ background: "#f0f4f2" }}>

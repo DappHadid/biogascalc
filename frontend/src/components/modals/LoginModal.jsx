@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalBase from "./ModalBase";
 import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "sonner";
 
 function InputField({ label, id, type = "text", placeholder, value, onChange, rightSlot }) {
   return (
@@ -55,12 +56,10 @@ export default function LoginModal({ open, onClose, onSwitchToRegister }) {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleClose = () => {
     setEmail("");
     setPassword("");
-    setError("");
     setShowPw(false);
     onClose();
   };
@@ -68,22 +67,21 @@ export default function LoginModal({ open, onClose, onSwitchToRegister }) {
   const handleSwitch = () => {
     setEmail("");
     setPassword("");
-    setError("");
     setShowPw(false);
     onSwitchToRegister();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     if (!email || !password) {
-      setError("Email dan password wajib diisi.");
+      toast.error("Email dan password wajib diisi.");
       return;
     }
     setLoading(true);
     try {
       const data = await login(email, password);
       handleClose();
+      toast.success("Login berhasil!");
       if (data.user?.role === 'admin') {
         navigate('/admin');
       }
@@ -91,7 +89,7 @@ export default function LoginModal({ open, onClose, onSwitchToRegister }) {
       const msg =
         err.response?.data?.message ||
         "Login gagal. Periksa kembali email dan password.";
-      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -182,22 +180,6 @@ export default function LoginModal({ open, onClose, onSwitchToRegister }) {
             Lupa password?
           </button>
         </div>
-
-        {/* Error */}
-        {error && (
-          <div
-            style={{
-              padding: "10px 14px",
-              borderRadius: 8,
-              backgroundColor: "#fff8e0",
-              border: "1px solid #f5bc2f",
-              fontSize: "0.8125rem",
-              color: "#946f3f",
-            }}
-          >
-            {error}
-          </div>
-        )}
 
         {/* Submit */}
         <button

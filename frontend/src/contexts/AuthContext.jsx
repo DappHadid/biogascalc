@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../api/axios';
+import { toast } from 'sonner';
 
 const AuthContext = createContext(null);
 
@@ -58,6 +59,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('bgc_token');
     setToken(null);
     setUser(null);
+    toast.success("Berhasil logout!");
   }, []);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';

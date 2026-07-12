@@ -1,8 +1,24 @@
 /* ── ParameterPanel — input form for dome parameters ────────── */
 
+const CircularIcon = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 26V36C14 37.1046 14.8954 38 16 38H32C33.1046 38 34 37.1046 34 36V26" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M14 26C14 20.4772 18.4772 16 24 16C29.5228 16 34 20.4772 34 26" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 26H36" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const RectangleIcon = ({ color }) => (
+  <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 18H36V36C36 37.1046 35.1046 38 34 38H14C12.8954 38 12 37.1046 12 36V18Z" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M10 18H38" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 28H36" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 4" opacity="0.6"/>
+  </svg>
+);
+
 const SHAPE_OPTIONS = [
-  { value: "circular",  label: "Circular" },
-  { value: "rectangle", label: "Rectangle" },
+  { value: "circular",  label: "Circular", icon: CircularIcon },
+  { value: "rectangle", label: "Rectangle", icon: RectangleIcon },
 ];
 
 const DEFAULT_PARAMS = {
@@ -11,8 +27,8 @@ const DEFAULT_PARAMS = {
   length:     600,
   width:      400,
   wallHeight: 200,
-  slurryPct:  30,
   shapeType:  "circular",
+  showPerson: true,
 };
 
 function Field({ label, unit, children }) {
@@ -70,8 +86,8 @@ function RangeInput({ value, min, max, step = 1, onChange }) {
   );
 }
 
-export default function ParameterPanel({ params, onChange }) {
-  const set = (key) => (val) => onChange({ ...params, [key]: val });
+export default function ParameterPanel({ params, onChange, onApply }) {
+  const set = (key, apply = false) => (val) => onChange({ ...params, [key]: val }, apply);
   const isRectangle = params.shapeType === "rectangle";
 
   return (
@@ -100,16 +116,21 @@ export default function ParameterPanel({ params, onChange }) {
 
       {/* Shape type */}
       <Field label="Bentuk Dome">
-        <div className="grid grid-cols-2 gap-1.5">
+        <div className="grid grid-cols-2 gap-2">
           {SHAPE_OPTIONS.map((opt) => {
             const active = params.shapeType === opt.value;
+            const Icon = opt.icon;
             return (
               <button
                 key={opt.value}
-                onClick={() => set("shapeType")(opt.value)}
+                onClick={() => set("shapeType", true)(opt.value)}
                 style={{
-                  padding: "7px 4px",
-                  borderRadius: 8,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "10px 4px",
+                  borderRadius: 10,
                   fontSize: "0.8125rem",
                   fontWeight: active ? 600 : 500,
                   border: active ? "1.5px solid #00ed64" : "1px solid #e1e5e8",
@@ -119,6 +140,7 @@ export default function ParameterPanel({ params, onChange }) {
                   transition: "all 0.15s",
                 }}
               >
+                <Icon color={active ? "#00684a" : "#a8b3bc"} />
                 {opt.label}
               </button>
             );
@@ -177,55 +199,67 @@ export default function ParameterPanel({ params, onChange }) {
         </>
       )}
 
-      {/* Slurry */}
-      <Field label="Volume Slurry" unit="0 – 100 %">
-        <RangeInput
-          value={params.slurryPct}
-          min={0} max={100} step={1}
-          onChange={set("slurryPct")}
-        />
-        {/* Slurry fill visual */}
-        <div
-          className="mt-2 overflow-hidden"
-          style={{
-            height: 6,
-            borderRadius: 9999,
-            backgroundColor: "#e1e5e8",
-          }}
-        >
-          <div
+      {/* Buttons & Toggles */}
+      <div className="flex flex-col gap-4 mt-auto">
+        {/* Toggle Figur */}
+        <div className="flex items-center justify-between">
+          <label
+            style={{ fontSize: "0.875rem", fontWeight: 600, color: "#3d4f5b", cursor: "pointer", margin: 0 }}
+            onClick={() => set("showPerson", true)(!params.showPerson)}
+          >
+            Tampilkan Figur Manusia
+          </label>
+          <button
+            type="button"
+            onClick={() => set("showPerson", true)(!params.showPerson)}
             style={{
-              height: "100%",
-              width: `${params.slurryPct}%`,
+              width: 44,
+              height: 24,
               borderRadius: 9999,
-              backgroundColor: "#00ed64",
-              transition: "width 0.2s",
+              backgroundColor: params.showPerson ? "#00ed64" : "#c1ccd6",
+              border: "none",
+              position: "relative",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
             }}
-          />
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 2,
+                left: params.showPerson ? 22 : 2,
+                width: 20,
+                height: 20,
+                borderRadius: "50%",
+                backgroundColor: "#ffffff",
+                transition: "left 0.2s ease-in-out",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+              }}
+            />
+          </button>
         </div>
-      </Field>
 
-      {/* Reset */}
-      <button
-        onClick={() => onChange(DEFAULT_PARAMS)}
-        style={{
-          width: "100%",
-          padding: "9px 0",
-          borderRadius: 9999,
-          fontSize: "0.875rem",
-          fontWeight: 600,
-          border: "1px solid #c1ccd6",
-          backgroundColor: "transparent",
-          color: "#3d4f5b",
-          cursor: "pointer",
-          transition: "all 0.15s",
-          marginTop: "auto",
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#001e2b"; e.currentTarget.style.backgroundColor = "#f9fbfa"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#c1ccd6"; e.currentTarget.style.backgroundColor = "transparent"; }}
-      >
-        Reset Default
-      </button>
+        {/* Visualisasikan Button */}
+        <button
+          onClick={onApply}
+          style={{
+            width: "100%",
+            padding: "9px 0",
+            borderRadius: 9999,
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            border: "none",
+            backgroundColor: "#00ed64",
+            color: "#001e2b",
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#00d85a"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "#00ed64"; }}
+        >
+          Visualisasikan
+        </button>
+      </div>
     </div>
   );
 }

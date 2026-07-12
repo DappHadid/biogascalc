@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ModalBase from "./ModalBase";
 import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "sonner";
 
 function InputField({ label, id, type = "text", placeholder, value, onChange, rightSlot, hint }) {
   return (
@@ -80,13 +81,11 @@ export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
   const [showPw, setShowPw] = useState(false);
   const [showCf, setShowCf] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const handleClose = () => {
     setForm({ name: "", email: "", password: "", confirm: "" });
-    setError("");
     setShowPw(false);
     setShowCf(false);
     onClose();
@@ -94,7 +93,6 @@ export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
 
   const handleSwitch = () => {
     setForm({ name: "", email: "", password: "", confirm: "" });
-    setError("");
     setShowPw(false);
     setShowCf(false);
     onSwitchToLogin();
@@ -102,28 +100,28 @@ export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     if (!form.name || !form.email || !form.password || !form.confirm) {
-      setError("Semua field wajib diisi.");
+      toast.error("Semua field wajib diisi.");
       return;
     }
     if (form.password !== form.confirm) {
-      setError("Password dan konfirmasi tidak cocok.");
+      toast.error("Password dan konfirmasi tidak cocok.");
       return;
     }
     if (form.password.length < 8) {
-      setError("Password minimal 8 karakter.");
+      toast.error("Password minimal 8 karakter.");
       return;
     }
     setLoading(true);
     try {
       await register(form.name, form.email, form.password);
       handleClose();
+      toast.success("Registrasi berhasil!");
     } catch (err) {
       const msg =
         err.response?.data?.message ||
         "Pendaftaran gagal. Coba lagi.";
-      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -203,22 +201,6 @@ export default function RegisterModal({ open, onClose, onSwitchToLogin }) {
           rightSlot={<EyeToggle show={showCf} onToggle={() => setShowCf((v) => !v)} label={showCf ? "Sembunyikan" : "Tampilkan"} />}
           hint={form.confirm && form.password !== form.confirm ? "Password tidak cocok" : ""}
         />
-
-        {/* Error */}
-        {error && (
-          <div
-            style={{
-              padding: "10px 14px",
-              borderRadius: 8,
-              backgroundColor: "#fff8e0",
-              border: "1px solid #f5bc2f",
-              fontSize: "0.8125rem",
-              color: "#946f3f",
-            }}
-          >
-            {error}
-          </div>
-        )}
 
         {/* Terms note */}
         {/* <p style={{ fontSize: "0.75rem", color: "#a8b3bc", lineHeight: 1.5 }}>

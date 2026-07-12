@@ -14,6 +14,7 @@ export default function DomeCalculator() {
   const { user } = useAuth();
   const maxVolume = user ? 40 : 5;
 
+  const [draftParams, setDraftParams] = useState(DEFAULT_PARAMS);
   const [params, setParams] = useState(DEFAULT_PARAMS);
   const [modal, setModal] = useState(null); // 'login' | 'register' | null
 
@@ -35,26 +36,42 @@ export default function DomeCalculator() {
         </h1>
       </div>
 
-      {/* ── Main layout: 2-col desktop / stack mobile ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4">
+      {/* ── Main layout: 3-col desktop / stack mobile ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-4 lg:gap-6 items-start">
+        
+        {/* ── LEFT: Parameter Panel (ordered second on mobile) ── */}
+        <div 
+          className="order-2 lg:order-1"
+          style={{ position: "sticky", top: 106, maxHeight: "calc(100vh - 120px)", overflowY: "auto", borderRadius: 12 }}
+        >
+          <ParameterPanel params={draftParams} onChange={(newParams, apply) => {
+            setDraftParams(newParams);
+            if (apply) setParams(newParams);
+          }} onApply={() => setParams(draftParams)} />
+        </div>
 
-        {/* ── LEFT: Visualizer (tall) ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div style={{ height: "clamp(360px, 55vh, 600px)" }}>
-            <DomeVisualizer calc={cappedCalc} params={cappedParams} />
-          </div>
-          <ParameterPanel params={params} onChange={setParams} />
+        {/* ── CENTER: Visualizer (Main focus, ordered first on mobile) ── */}
+        <div 
+          className="order-1 lg:order-2"
+          style={{ height: "clamp(400px, 65vh, 800px)", position: "sticky", top: 106 }}
+        >
+          <DomeVisualizer calc={cappedCalc} params={cappedParams} />
         </div>
 
         {/* ── RIGHT: Stats ── */}
-        <StatsPanel
-          calc={cappedCalc}
-          params={params}
-          isCapped={isCapped}
-          maxVolume={maxVolume}
-          user={user}
-          onLoginClick={() => setModal("login")}
-        />
+        <div 
+          className="order-3 lg:order-3"
+          style={{ position: "sticky", top: 106, maxHeight: "calc(100vh - 120px)", overflowY: "auto", borderRadius: 12 }}
+        >
+          <StatsPanel
+            calc={cappedCalc}
+            params={params}
+            isCapped={isCapped}
+            maxVolume={maxVolume}
+            user={user}
+            onLoginClick={() => setModal("login")}
+          />
+        </div>
       </div>
 
       {/* ── Materials estimate table ── */}

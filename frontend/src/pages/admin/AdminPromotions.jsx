@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { ShieldAlert, TrendingUp, Calculator, Cuboid, CheckSquare } from "lucide-react";
 import api from "../../api/axios";
+import { toast } from "sonner";
 
 export default function AdminPromotions() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -19,9 +19,9 @@ export default function AdminPromotions() {
       setLoading(true);
       const { data } = await api.get("/users/promotions");
       setUsers(data.data);
-      setError(null);
+      setUsers(data.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal mengambil data promosi pengguna");
+      toast.error(err.response?.data?.message || "Gagal mengambil data promosi pengguna");
     } finally {
       setLoading(false);
     }
@@ -43,13 +43,6 @@ export default function AdminPromotions() {
           <p className="admin-dashboard__subtitle">Pantau aktivitas perancangan dome dan penggunaan kalkulator oleh User</p>
         </div>
       </div>
-
-      {error && (
-        <div style={{ backgroundColor: "#fee2e2", color: "#ef4444", padding: "12px", borderRadius: "8px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
-          <ShieldAlert size={20} />
-          {error}
-        </div>
-      )}
 
       <div className="admin-chart-card admin-chart-card--wide">
         <div className="admin-table-wrap">
