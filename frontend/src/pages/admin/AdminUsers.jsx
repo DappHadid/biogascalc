@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, ShieldAlert, Eye, X } from "lucide-react";
 import api from "../../api/axios";
+import { toast } from "sonner";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [allDomes, setAllDomes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "admin", assignedDomes: [] });
-  const [formError, setFormError] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
 
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -33,16 +32,14 @@ export default function AdminUsers() {
       ]);
       setUsers(usersRes.data.data);
       setAllDomes(domesRes.data.data);
-      setError(null);
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal mengambil data");
+      toast.error(err.response?.data?.message || "Gagal mengambil data pengguna");
     } finally {
       setLoading(false);
     }
   };
 
   const handleOpenModal = (user = null) => {
-    setFormError(null);
     if (user) {
       setEditingUser(user);
       setFormData({
@@ -87,7 +84,6 @@ export default function AdminUsers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormError(null);
     setFormLoading(true);
 
     try {
@@ -98,6 +94,7 @@ export default function AdminUsers() {
           role: formData.role,
           assignedDomes: formData.assignedDomes
         });
+        toast.success("Admin berhasil diperbarui");
       } else {
         await api.post("/users", {
           name: formData.name,
@@ -106,6 +103,7 @@ export default function AdminUsers() {
           role: formData.role,
           assignedDomes: formData.assignedDomes
         });
+        toast.success("Admin berhasil ditambahkan");
       }
       
       const { data } = await api.get("/users");
@@ -113,7 +111,7 @@ export default function AdminUsers() {
       
       handleCloseModal();
     } catch (err) {
-      setFormError(err.response?.data?.message || "Terjadi kesalahan");
+      toast.error(err.response?.data?.message || "Terjadi kesalahan saat menyimpan data");
     } finally {
       setFormLoading(false);
     }
@@ -125,8 +123,9 @@ export default function AdminUsers() {
       await api.delete(`/users/${id}`);
       const { data } = await api.get("/users");
       setUsers(data.data);
+      toast.success("Pengguna berhasil dihapus");
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menghapus pengguna");
+      toast.error(err.response?.data?.message || "Gagal menghapus pengguna");
     }
   };
 
@@ -146,13 +145,6 @@ export default function AdminUsers() {
           Tambah Admin
         </button>
       </div>
-
-      {error && (
-        <div style={{ backgroundColor: "#fee2e2", color: "#ef4444", padding: "12px", borderRadius: "8px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
-          <ShieldAlert size={20} />
-          {error}
-        </div>
-      )}
 
       <div className="admin-chart-card admin-chart-card--wide">
         <div className="admin-table-wrap">
@@ -280,12 +272,6 @@ export default function AdminUsers() {
             <h2 style={{ margin: "0 0 20px 0", fontSize: "1.25rem", color: "#1e293b" }}>
               {editingUser ? "Edit Pengguna" : "Tambah Admin"}
             </h2>
-            
-            {formError && (
-              <div style={{ backgroundColor: "#fee2e2", color: "#ef4444", padding: "10px", borderRadius: "6px", marginBottom: "20px", fontSize: "0.875rem" }}>
-                {formError}
-              </div>
-            )}
 
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: "16px" }}>

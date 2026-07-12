@@ -13,6 +13,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import api from "../../api/axios";
 import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "sonner";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -174,10 +175,11 @@ export default function AdminDomes() {
       } else {
         await api.post("/domes", payload);
       }
+      toast.success(editId ? "Dome berhasil diperbarui" : "Dome berhasil ditambahkan");
       closeModal();
       fetchDomes();
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menyimpan data.");
+      toast.error(err.response?.data?.message || "Gagal menyimpan data.");
     } finally {
       setSaving(false);
     }
@@ -188,10 +190,11 @@ export default function AdminDomes() {
     setDeleting(true);
     try {
       await api.delete(`/domes/${deleteTarget._id}`);
+      toast.success("Dome berhasil dihapus");
       setDeleteTarget(null);
       fetchDomes();
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menghapus data.");
+      toast.error(err.response?.data?.message || "Gagal menghapus data.");
     } finally {
       setDeleting(false);
     }

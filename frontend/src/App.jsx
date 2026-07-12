@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import SiteFrame from "./components/layouts/SiteFrame";
 import Navbar from "./components/layouts/Navbar";
@@ -18,6 +19,7 @@ import SuperAdminRoute from "./components/auth/SuperAdminRoute";
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" richColors />
       <AuthProvider>
         <Routes>
           <Route
