@@ -1,52 +1,77 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Nama wajib diisi'],
-      trim: true,
-      maxlength: [100, 'Nama maksimal 100 karakter'],
+module.exports = (sequelize) => {
+  const User = sequelize.define(
+    'User',
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: 'Nama wajib diisi' },
+          len: { args: [1, 100], msg: 'Nama maksimal 100 karakter' },
+        },
+      },
+      email: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: { msg: 'Email sudah terdaftar' },
+        validate: {
+          isEmail: { msg: 'Format email tidak valid' },
+          notEmpty: { msg: 'Email wajib diisi' },
+        },
+        set(value) {
+          this.setDataValue('email', value ? value.toLowerCase().trim() : value);
+        },
+      },
+      password: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: 'Password wajib diisi' },
+          len: { args: [8, 255], msg: 'Password minimal 8 karakter' },
+        },
+      },
+      role: {
+        type: DataTypes.ENUM('user', 'admin', 'superadmin'),
+        defaultValue: 'user',
+      },
     },
-    email: {
-      type: String,
-      required: [true, 'Email wajib diisi'],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Format email tidak valid'],
-    },
-    password: {
-      type: String,
-      required: [true, 'Password wajib diisi'],
-      minlength: [8, 'Password minimal 8 karakter'],
-      select: false,
-    },
-    role: {
-      type: String,
-      enum: ['user', 'admin', 'superadmin'],
-      default: 'user',
-    },
-    assignedDomes: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Dome',
-      }
-    ],
-  },
-  { timestamps: true }
-);
+    {
+      defaultScope: {
+        attributes: { exclude: ['password'] },
+      },
+      scopes: {
+        withPassword: {
+          attributes: {},
+        },
+      },
+    }
+  );
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+  User.beforeCreate(async (user) => {
+    if (user.password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return bcrypt.compare(enteredPassword, this.password);
+  User.beforeUpdate(async (user) => {
+    if (user.changed('password')) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(user.password, salt);
+    }
+  });
+
+  User.prototype.matchPassword = async function (enteredPassword) {
+    return bcrypt.compare(enteredPassword, this.password);
+  };
+
+  return User;
 };
-
-module.exports = mongoose.model('User', userSchema);

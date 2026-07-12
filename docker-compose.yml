@@ -1,13 +1,15 @@
 services:
-  # MongoDB Database
-  mongo:
-    image: mongo:7
-    container_name: biogascalc-mongo
+  mysql:
+    image: mysql:8
+    container_name: biogascalc-mysql
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=biogascalc
     volumes:
-      - mongo_data:/data/db
+      - mysql_data:/var/lib/mysql
     networks:
       - biogascalc-network
 
@@ -22,10 +24,14 @@ services:
       - "5000:5000"
     environment:
       - PORT=5000
-      - MONGO_URI=mongodb://mongo:27017/biogascalc
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=biogascalc
+      - DB_PORT=3306
       - NODE_ENV=development
     depends_on:
-      - mongo
+      - mysql
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -50,7 +56,7 @@ services:
       - biogascalc-network
 
 volumes:
-  mongo_data:
+  mysql_data:
 
 networks:
   biogascalc-network:

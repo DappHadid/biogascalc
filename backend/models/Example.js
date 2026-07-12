@@ -1,28 +1,32 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
 
-const exampleSchema = new mongoose.Schema(
-  {
+module.exports = (sequelize) => {
+  const Example = sequelize.define('Example', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     name: {
-      type: String,
-      required: [true, 'Name is required'],
-      trim: true,
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Name is required' },
+      },
     },
     description: {
-      type: String,
-      default: '',
+      type: DataTypes.TEXT,
+      defaultValue: '',
     },
     value: {
-      type: Number,
-      default: 0,
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
     },
     isActive: {
-      type: Boolean,
-      default: true,
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
-  },
-  {
-    timestamps: true,
-  }
-);
+  });
 
-module.exports = mongoose.model('Example', exampleSchema);
+  return Example;
+};

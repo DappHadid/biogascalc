@@ -1,59 +1,82 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
 
-const domeSchema = new mongoose.Schema(
-  {
+module.exports = (sequelize) => {
+  const Dome = sequelize.define('Dome', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     name: {
-      type: String,
-      required: [true, 'Nama lokasi wajib diisi'],
-      trim: true,
-      maxlength: [200, 'Nama maksimal 200 karakter'],
+      type: DataTypes.STRING(200),
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Nama lokasi wajib diisi' },
+        len: { args: [1, 200], msg: 'Nama maksimal 200 karakter' },
+      },
     },
     city: {
-      type: String,
-      required: [true, 'Kota wajib diisi'],
-      trim: true,
-      maxlength: [150, 'Kota maksimal 150 karakter'],
+      type: DataTypes.STRING(150),
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Kota wajib diisi' },
+        len: { args: [1, 150], msg: 'Kota maksimal 150 karakter' },
+      },
     },
     lat: {
-      type: Number,
-      required: [true, 'Latitude wajib diisi'],
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+      validate: {
+        isFloat: { msg: 'Latitude harus berupa angka' },
+      },
     },
     lng: {
-      type: Number,
-      required: [true, 'Longitude wajib diisi'],
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+      validate: {
+        isFloat: { msg: 'Longitude harus berupa angka' },
+      },
     },
     type: {
-      type: String,
-      enum: ['Peternakan', 'Perkebunan', 'Industri', 'Komunitas'],
-      required: [true, 'Tipe wajib diisi'],
+      type: DataTypes.ENUM('Peternakan', 'Perkebunan', 'Industri', 'Komunitas'),
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'Tipe wajib diisi' },
+      },
     },
     limbahPerHari: {
-      type: Number,
-      default: 0,
-      min: [0, 'Limbah per hari tidak boleh negatif'],
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      validate: {
+        min: { args: [0], msg: 'Limbah per hari tidak boleh negatif' },
+      },
     },
     potensiGas: {
-      type: Number,
-      default: 0,
-      min: [0, 'Potensi gas tidak boleh negatif'],
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      validate: {
+        min: { args: [0], msg: 'Potensi gas tidak boleh negatif' },
+      },
     },
     diameter: {
-      type: Number,
-      default: 0,
-      min: [0, 'Diameter tidak boleh negatif'],
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      validate: {
+        min: { args: [0], msg: 'Diameter tidak boleh negatif' },
+      },
     },
     tinggi: {
-      type: Number,
-      default: 0,
-      min: [0, 'Tinggi tidak boleh negatif'],
+      type: DataTypes.DOUBLE,
+      defaultValue: 0,
+      validate: {
+        min: { args: [0], msg: 'Tinggi tidak boleh negatif' },
+      },
     },
     status: {
-      type: String,
-      enum: ['Aktif', 'Potensi'],
-      default: 'Potensi',
+      type: DataTypes.ENUM('Aktif', 'Potensi'),
+      defaultValue: 'Potensi',
     },
-  },
-  { timestamps: true }
-);
+  });
 
-module.exports = mongoose.model('Dome', domeSchema);
+  return Dome;
+};

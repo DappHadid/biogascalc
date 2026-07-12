@@ -73,7 +73,7 @@ export default function AdminPromotions() {
               </thead>
               <tbody>
                 {currentUsers.map((u) => (
-                  <tr key={u._id}>
+                  <tr key={u._id || u.id}>
                     <td>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div className="admin-table__avatar">

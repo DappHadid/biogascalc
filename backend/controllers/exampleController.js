@@ -1,8 +1,8 @@
-const Example = require('../models/Example');
+const { Example } = require('../models');
 
 const getExamples = async (req, res, next) => {
   try {
-    const examples = await Example.find().sort({ createdAt: -1 });
+    const examples = await Example.findAll({ order: [['createdAt', 'DESC']] });
     res.json({ success: true, count: examples.length, data: examples });
   } catch (error) {
     next(error);
@@ -11,7 +11,7 @@ const getExamples = async (req, res, next) => {
 
 const getExampleById = async (req, res, next) => {
   try {
-    const example = await Example.findById(req.params.id);
+    const example = await Example.findByPk(req.params.id);
     if (!example) {
       res.status(404);
       throw new Error('Example not found');
@@ -33,14 +33,12 @@ const createExample = async (req, res, next) => {
 
 const updateExample = async (req, res, next) => {
   try {
-    const example = await Example.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const example = await Example.findByPk(req.params.id);
     if (!example) {
       res.status(404);
       throw new Error('Example not found');
     }
+    await example.update(req.body);
     res.json({ success: true, data: example });
   } catch (error) {
     next(error);
@@ -49,11 +47,12 @@ const updateExample = async (req, res, next) => {
 
 const deleteExample = async (req, res, next) => {
   try {
-    const example = await Example.findByIdAndDelete(req.params.id);
+    const example = await Example.findByPk(req.params.id);
     if (!example) {
       res.status(404);
       throw new Error('Example not found');
     }
+    await example.destroy();
     res.json({ success: true, data: {} });
   } catch (error) {
     next(error);

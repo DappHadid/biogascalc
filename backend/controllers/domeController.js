@@ -1,21 +1,29 @@
-const Dome = require('../models/Dome');
+const { Dome, User } = require('../models');
 
 const getAllDomes = async (req, res, next) => {
   try {
-    const domes = await Dome.find().sort({ createdAt: -1 });
+    const domes = await Dome.findAll({ order: [['createdAt', 'DESC']] });
     res.json({ success: true, count: domes.length, data: domes });
   } catch (error) {
     next(error);
   }
 };
+
 const getManagedDomes = async (req, res, next) => {
   try {
-    let query = {};
+    let domes;
     if (req.user.role === 'admin') {
-      query = { _id: { $in: req.user.assignedDomes || [] } };
+      const userWithDomes = await User.findByPk(req.user.id, {
+        include: {
+          model: Dome,
+          as: 'assignedDomes',
+        },
+      });
+      domes = userWithDomes ? userWithDomes.assignedDomes : [];
+    } else {
+      domes = await Dome.findAll({ order: [['createdAt', 'DESC']] });
     }
-    
-    const domes = await Dome.find(query).sort({ createdAt: -1 });
+
     res.json({ success: true, count: domes.length, data: domes });
   } catch (error) {
     next(error);
@@ -24,7 +32,7 @@ const getManagedDomes = async (req, res, next) => {
 
 const getDomeById = async (req, res, next) => {
   try {
-    const dome = await Dome.findById(req.params.id);
+    const dome = await Dome.findByPk(req.params.id);
     if (!dome) {
       res.status(404);
       throw new Error('Dome tidak ditemukan.');
@@ -55,8 +63,8 @@ const createDome = async (req, res, next) => {
 
     res.status(201).json({ success: true, data: dome });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((e) => e.message);
+    if (error.name === 'SequelizeValidationError') {
+      const messages = error.errors.map((e) => e.message);
       res.status(400);
       return next(new Error(messages.join('. ')));
     }
@@ -66,24 +74,25 @@ const createDome = async (req, res, next) => {
 
 const updateDome = async (req, res, next) => {
   try {
-    const dome = await Dome.findById(req.params.id);
+    const dome = await Dome.findByPk(req.params.id);
     if (!dome) {
       res.status(404);
       throw new Error('Dome tidak ditemukan.');
     }
 
     const fields = ['name', 'city', 'lat', 'lng', 'type', 'limbahPerHari', 'potensiGas', 'diameter', 'tinggi', 'status'];
+    const updateData = {};
     fields.forEach((field) => {
       if (req.body[field] !== undefined) {
-        dome[field] = req.body[field];
+        updateData[field] = req.body[field];
       }
     });
 
-    const updated = await dome.save();
-    res.json({ success: true, data: updated });
+    await dome.update(updateData);
+    res.json({ success: true, data: dome });
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((e) => e.message);
+    if (error.name === 'SequelizeValidationError') {
+      const messages = error.errors.map((e) => e.message);
       res.status(400);
       return next(new Error(messages.join('. ')));
     }
@@ -93,13 +102,13 @@ const updateDome = async (req, res, next) => {
 
 const deleteDome = async (req, res, next) => {
   try {
-    const dome = await Dome.findById(req.params.id);
+    const dome = await Dome.findByPk(req.params.id);
     if (!dome) {
       res.status(404);
       throw new Error('Dome tidak ditemukan.');
     }
 
-    await dome.deleteOne();
+    await dome.destroy();
     res.json({ success: true, message: 'Dome berhasil dihapus.' });
   } catch (error) {
     next(error);

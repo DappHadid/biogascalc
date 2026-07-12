@@ -1,19 +1,21 @@
 {
   "name": "biogascalc",
   "version": "1.0.0",
-  "description": "BiogasCalc — Biogas Calculator Application (MERN Stack)",
+  "description": "BiogasCalc — Biogas Calculator Application",
   "private": true,
   "scripts": {
+    "postinstall": "cd backend && npm install && cd ../frontend && npm install",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "build:frontend": "cd frontend && npm run build"
+    "install:all": "npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && node server.js",
+    "seed:all": "cd backend && node scripts/seedSuperAdmin.js && node scripts/seedAdmin.js && node scripts/seedUser.js"
   },
   "keywords": [
     "biogas",
-    "calculator",
-    "mern"
+    "calculator"
   ],
   "author": "",
   "license": "ISC",

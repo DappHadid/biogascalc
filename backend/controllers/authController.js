@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { User } = require('../models');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -10,7 +10,7 @@ const generateToken = (id) => {
 const userResponse = (user, token) => ({
   success: true,
   user: {
-    id: user._id,
+    id: user.id,
     name: user.name,
     email: user.email,
     role: user.role,
@@ -27,19 +27,19 @@ const register = async (req, res, next) => {
       throw new Error('Semua field wajib diisi.');
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ where: { email: email.toLowerCase() } });
     if (existingUser) {
       res.status(409);
       throw new Error('Email sudah terdaftar. Silakan gunakan email lain atau login.');
     }
 
     const user = await User.create({ name, email, password, role: 'user' });
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.status(201).json(userResponse(user, token));
   } catch (error) {
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((e) => e.message);
+    if (error.name === 'SequelizeValidationError') {
+      const messages = error.errors.map((e) => e.message);
       res.status(400);
       return next(new Error(messages.join('. ')));
     }
@@ -56,7 +56,9 @@ const login = async (req, res, next) => {
       throw new Error('Email dan password wajib diisi.');
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const user = await User.scope('withPassword').findOne({
+      where: { email: email.toLowerCase() },
+    });
 
     if (!user) {
       res.status(401);
@@ -69,7 +71,7 @@ const login = async (req, res, next) => {
       throw new Error('Email atau password salah.');
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
     res.json(userResponse(user, token));
   } catch (error) {
     next(error);
@@ -80,7 +82,7 @@ const getMe = async (req, res) => {
   res.json({
     success: true,
     user: {
-      id: req.user._id,
+      id: req.user.id,
       name: req.user.name,
       email: req.user.email,
       role: req.user.role,

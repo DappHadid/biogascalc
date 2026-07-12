@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
-const User = require('../models/User');
-const connectDB = require('../config/db');
+const { syncDB } = require('../config/db');
+const { User } = require('../models');
 
 const ADMIN_DATA = {
   name: 'Administrator',
@@ -16,9 +15,9 @@ const ADMIN_DATA = {
 
 const seedAdmin = async () => {
   try {
-    await connectDB();
+    await syncDB();
 
-    const existing = await User.findOne({ email: ADMIN_DATA.email });
+    const existing = await User.findOne({ where: { email: ADMIN_DATA.email } });
     if (existing) {
       console.log('\nAdmin account already exists:');
       console.log(`   Email: ${existing.email}`);

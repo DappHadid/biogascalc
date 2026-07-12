@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { User } = require('../models');
 
 const protect = async (req, res, next) => {
   let token;
@@ -18,7 +18,7 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select('-password');
+    req.user = await User.findByPk(decoded.id);
 
     if (!req.user) {
       res.status(401);
@@ -55,7 +55,7 @@ const protectSuperAdmin = async (req, res, next) => {
     const targetUserId = req.params.id;
     if (!targetUserId) return next();
 
-    const targetUser = await User.findById(targetUserId);
+    const targetUser = await User.findByPk(targetUserId);
     if (targetUser && targetUser.role === 'superadmin') {
       res.status(403);
       return next(new Error('Super Admin tidak dapat diubah atau dihapus.'));

@@ -1,10 +1,16 @@
-const User = require('../models/User');
+const { User, Dome } = require('../models');
 
 const getUsers = async (req, res, next) => {
   try {
-    const users = await User.find({ role: 'admin' })
-      .populate('assignedDomes', 'name city type status')
-      .select('-password');
+    const users = await User.findAll({
+      where: { role: 'admin' },
+      include: {
+        model: Dome,
+        as: 'assignedDomes',
+        attributes: ['id', 'name', 'city', 'type', 'status'],
+        through: { attributes: [] },
+      },
+    });
     res.json({ success: true, count: users.length, data: users });
   } catch (error) {
     next(error);
@@ -22,7 +28,7 @@ const createUser = async (req, res, next) => {
 
     const userRole = 'admin';
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ where: { email: email.toLowerCase() } });
     if (existingUser) {
       res.status(409);
       throw new Error('Email sudah terdaftar.');
@@ -33,19 +39,29 @@ const createUser = async (req, res, next) => {
       email,
       password,
       role: userRole,
-      assignedDomes: assignedDomes || [],
     });
 
-    await user.populate('assignedDomes', 'name city type status');
+    if (assignedDomes && assignedDomes.length > 0) {
+      await user.setAssignedDomes(assignedDomes);
+    }
+
+    const result = await User.findByPk(user.id, {
+      include: {
+        model: Dome,
+        as: 'assignedDomes',
+        attributes: ['id', 'name', 'city', 'type', 'status'],
+        through: { attributes: [] },
+      },
+    });
 
     res.status(201).json({
       success: true,
       data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        assignedDomes: user.assignedDomes,
+        id: result.id,
+        name: result.name,
+        email: result.email,
+        role: result.role,
+        assignedDomes: result.assignedDomes,
       },
     });
   } catch (error) {
@@ -57,27 +73,33 @@ const updateUser = async (req, res, next) => {
   try {
     const { name, email, role, assignedDomes } = req.body;
 
-    let updateData = { name, email };
-    if (role && role !== 'user') {
-      updateData.role = role;
-    }
-    if (assignedDomes !== undefined) {
-      updateData.assignedDomes = assignedDomes;
-    }
-
-    const user = await User.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-      runValidators: true,
-    })
-      .populate('assignedDomes', 'name city type status')
-      .select('-password');
-
+    const user = await User.findByPk(req.params.id);
     if (!user) {
       res.status(404);
       throw new Error('User tidak ditemukan.');
     }
 
-    res.json({ success: true, data: user });
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (email !== undefined) updateData.email = email;
+    if (role && role !== 'user') updateData.role = role;
+
+    await user.update(updateData);
+
+    if (assignedDomes !== undefined) {
+      await user.setAssignedDomes(assignedDomes);
+    }
+
+    const result = await User.findByPk(user.id, {
+      include: {
+        model: Dome,
+        as: 'assignedDomes',
+        attributes: ['id', 'name', 'city', 'type', 'status'],
+        through: { attributes: [] },
+      },
+    });
+
+    res.json({ success: true, data: result });
   } catch (error) {
     next(error);
   }
@@ -85,13 +107,14 @@ const updateUser = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findByPk(req.params.id);
 
     if (!user) {
       res.status(404);
       throw new Error('User tidak ditemukan.');
     }
 
+    await user.destroy();
     res.json({ success: true, message: 'User berhasil dihapus.' });
   } catch (error) {
     next(error);
@@ -100,15 +123,15 @@ const deleteUser = async (req, res, next) => {
 
 const getPromotionUsers = async (req, res, next) => {
   try {
-    let users = await User.find({ role: 'user' }).select('-password');
+    let users = await User.findAll({ where: { role: 'user' } });
     
     if (users.length === 0) {
       users = [
-        { _id: 'dummy-1', name: 'Budi Santoso', email: 'budi@example.com', createdAt: new Date() },
-        { _id: 'dummy-2', name: 'Siti Aminah', email: 'siti@example.com', createdAt: new Date() },
-        { _id: 'dummy-3', name: 'Andi Wijaya', email: 'andi@example.com', createdAt: new Date() },
-        { _id: 'dummy-4', name: 'Rina Kartika', email: 'rina@example.com', createdAt: new Date() },
-        { _id: 'dummy-5', name: 'Dewi Lestari', email: 'dewi@example.com', createdAt: new Date() }
+        { id: 'dummy-1', name: 'Budi Santoso', email: 'budi@example.com', createdAt: new Date() },
+        { id: 'dummy-2', name: 'Siti Aminah', email: 'siti@example.com', createdAt: new Date() },
+        { id: 'dummy-3', name: 'Andi Wijaya', email: 'andi@example.com', createdAt: new Date() },
+        { id: 'dummy-4', name: 'Rina Kartika', email: 'rina@example.com', createdAt: new Date() },
+        { id: 'dummy-5', name: 'Dewi Lestari', email: 'dewi@example.com', createdAt: new Date() },
       ];
     }
     
@@ -116,7 +139,7 @@ const getPromotionUsers = async (req, res, next) => {
       const rand = () => Math.floor(Math.random() * 11);
       
       return {
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         createdAt: user.createdAt,
@@ -124,8 +147,8 @@ const getPromotionUsers = async (req, res, next) => {
           designHemisphere: rand(),
           designSemiEllipsoid: rand(),
           designCustom: rand(),
-          wasteCalculator: rand()
-        }
+          wasteCalculator: rand(),
+        },
       };
     });
 
@@ -140,5 +163,5 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
-  getPromotionUsers
+  getPromotionUsers,
 };

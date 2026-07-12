@@ -127,7 +127,7 @@ export default function AdminDomes() {
   };
 
   const openEditModal = (dome) => {
-    setEditId(dome._id);
+    setEditId(dome._id || dome.id);
     setForm({
       name: dome.name,
       city: dome.city,
@@ -201,10 +201,10 @@ export default function AdminDomes() {
   };
 
   const handleSelectDome = useCallback((dome) => {
-    setActiveDome(dome._id);
+    setActiveDome(dome._id || dome.id);
     setFlyTarget(dome);
     setTimeout(() => {
-      markersRef.current[dome._id]?.openPopup();
+      markersRef.current[dome._id || dome.id]?.openPopup();
     }, 1100);
   }, []);
 
@@ -240,11 +240,11 @@ export default function AdminDomes() {
           <FlyTo target={flyTarget} />
           {domes.map((dome) => (
             <Marker
-              key={dome._id}
+              key={dome._id || dome.id}
               position={[dome.lat, dome.lng]}
-              icon={makeIcon(activeDome === dome._id)}
+              icon={makeIcon(activeDome === (dome._id || dome.id))}
               ref={(ref) => {
-                if (ref) markersRef.current[dome._id] = ref;
+                if (ref) markersRef.current[dome._id || dome.id] = ref;
               }}
               eventHandlers={{ click: () => handleSelectDome(dome) }}
             >
@@ -333,7 +333,7 @@ export default function AdminDomes() {
                   const typeColor = TYPE_COLOR[dome.type] || { bg: "#f1f5f9", text: "#475569" };
                   return (
                     <tr
-                      key={dome._id}
+                      key={dome._id || dome.id}
                       style={{ cursor: "pointer" }}
                       onClick={() => handleSelectDome(dome)}
                     >
