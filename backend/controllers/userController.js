@@ -123,34 +123,46 @@ const deleteUser = async (req, res, next) => {
 
 const getPromotionUsers = async (req, res, next) => {
   try {
-    let users = await User.findAll({ where: { role: 'user' } });
-    
+    const { UserActivity } = require('../models');
+    const { fn, col } = require('sequelize');
+
+    const users = await User.findAll({ where: { role: 'user' } });
+
     if (users.length === 0) {
-      users = [
-        { id: 'dummy-1', name: 'Budi Santoso', email: 'budi@example.com', createdAt: new Date() },
-        { id: 'dummy-2', name: 'Siti Aminah', email: 'siti@example.com', createdAt: new Date() },
-        { id: 'dummy-3', name: 'Andi Wijaya', email: 'andi@example.com', createdAt: new Date() },
-        { id: 'dummy-4', name: 'Rina Kartika', email: 'rina@example.com', createdAt: new Date() },
-        { id: 'dummy-5', name: 'Dewi Lestari', email: 'dewi@example.com', createdAt: new Date() },
-      ];
+      return res.json({ success: true, count: 0, data: [] });
     }
-    
-    const usersWithStats = users.map(user => {
-      const rand = () => Math.floor(Math.random() * 11);
-      
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.createdAt,
-        stats: {
-          designHemisphere: rand(),
-          designSemiEllipsoid: rand(),
-          designCustom: rand(),
-          wasteCalculator: rand(),
-        },
-      };
+
+    const userIds = users.map(u => u.id);
+
+    const activityCounts = await UserActivity.findAll({
+      where: { userId: userIds },
+      attributes: [
+        'userId',
+        'action',
+        [fn('COUNT', col('id')), 'count'],
+      ],
+      group: ['userId', 'action'],
+      raw: true,
     });
+
+    const statsMap = {};
+    for (const row of activityCounts) {
+      if (!statsMap[row.userId]) {
+        statsMap[row.userId] = { visualize_circular: 0, visualize_rectangle: 0 };
+      }
+      statsMap[row.userId][row.action] = parseInt(row.count, 10);
+    }
+
+    const usersWithStats = users.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      stats: {
+        designCircular: statsMap[user.id]?.visualize_circular || 0,
+        designRectangle: statsMap[user.id]?.visualize_rectangle || 0,
+      },
+    }));
 
     res.json({ success: true, count: usersWithStats.length, data: usersWithStats });
   } catch (error) {

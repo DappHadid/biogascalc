@@ -1,47 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Plus, ArrowUpRight } from "lucide-react";
-
-const FAQ_CATEGORIES = [
-  {
-    category: "Umum",
-    items: [
-      {
-        q: "Apa itu BioGasCalc?",
-        a: "BioGasCalc adalah kalkulator berbasis web untuk mengestimasi potensi produksi biogas dari limbah organik, sekaligus membantu merancang ukuran reaktor dome yang sesuai.",
-      },
-      {
-        q: "Apakah alat ini gratis digunakan?",
-        a: "Ya, seluruh fitur kalkulator dan perancangan dome dapat digunakan tanpa biaya sebagai bagian dari Program Kreativitas Mahasiswa (PKM).",
-      },
-    ],
-  },
-  {
-    category: "Teknis & Fitur",
-    items: [
-      {
-        q: "Jenis limbah apa saja yang bisa dihitung?",
-        a: "Kalkulator mendukung berbagai jenis limbah organik rumah tangga dan peternakan, seperti sisa makanan, kotoran ternak, dan limbah sayuran.",
-      },
-      {
-        q: "Seberapa akurat estimasi yang dihasilkan?",
-        a: "Estimasi dihitung berdasarkan rasio produksi biogas dari data riset yang telah divalidasi, namun hasil aktual di lapangan dapat bervariasi tergantung kondisi reaktor dan lingkungan.",
-      },
-    ],
-  },
-  {
-    category: "Langkah Selanjutnya",
-    items: [
-      {
-        q: "Bagaimana cara memulai membangun reaktor dome?",
-        a: "Setelah mendapatkan hasil estimasi dari kalkulator, Anda dapat menggunakan fitur Rancang Dome untuk memperoleh rekomendasi ukuran dan spesifikasi reaktor.",
-      },
-    ],
-  },
-];
+import { Plus } from "lucide-react";
+import api from "../../api/axios";
 
 export default function Faq() {
-  const [openId, setOpenId] = useState("Umum-0");
+  const [openId, setOpenId] = useState(null);
+  const [faqCategories, setFaqCategories] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    api
+      .get("/homepage/faq")
+      .then(({ data }) => {
+        setFaqCategories(data.data);
+        setLoaded(true);
+        if (data.data.length > 0 && data.data[0].items.length > 0) {
+          setOpenId(`${data.data[0].category}-0`);
+        }
+      })
+      .catch(() => {
+        setLoaded(true);
+      });
+  }, []);
+
+  if (!loaded || faqCategories.length === 0) return null;
 
   return (
     <section className="relative overflow-hidden pt-24 pb-[320px] max-[850px]:pt-16 max-[850px]:pb-[260px] bg-white">
@@ -54,7 +36,7 @@ export default function Faq() {
 
           {/* KOLOM KANAN: Daftar Kategori & FAQ */}
           <div className="lg:col-span-7 flex flex-col gap-12">
-            {FAQ_CATEGORIES.map((group) => (
+            {faqCategories.map((group) => (
               <div key={group.category}>
                 <h3 className="font-semibold text-xl text-slate-900 mb-4 tracking-tight">{group.category}</h3>
 

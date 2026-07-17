@@ -10,6 +10,10 @@ function initModels() {
   const User = require('./User')(sequelize);
   const Dome = require('./Dome')(sequelize);
   const Example = require('./Example')(sequelize);
+  const { HowItWorksStep, FaqItem } = require('./HomepageContent')(sequelize);
+  const UserActivity = require('./UserActivity')(sequelize);
+  const AppSetting = require('./AppSetting')(sequelize);
+  const PromoEmailLog = require('./PromoEmailLog')(sequelize);
 
   User.belongsToMany(Dome, {
     through: 'UserDomes',
@@ -25,7 +29,15 @@ function initModels() {
     otherKey: 'userId',
   });
 
-  models = { User, Dome, Example };
+  User.hasMany(UserActivity, { foreignKey: 'userId', as: 'activities' });
+  UserActivity.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+  User.hasMany(PromoEmailLog, { foreignKey: 'userId', as: 'promoEmails' });
+  PromoEmailLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+  
+  PromoEmailLog.belongsTo(User, { foreignKey: 'sentById', as: 'sender' });
+
+  models = { User, Dome, Example, HowItWorksStep, FaqItem, UserActivity, AppSetting, PromoEmailLog };
   return models;
 }
 

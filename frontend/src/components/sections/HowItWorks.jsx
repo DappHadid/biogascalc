@@ -2,36 +2,12 @@ import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { ClipboardList, Cog, LineChart, Hammer, Workflow } from "lucide-react";
 import Reveal from "./Reveal";
+import api from "../../api/axios";
 
-const STEPS = [
-  {
-    icon: ClipboardList,
-    step: "01",
-    title: "Masukkan Data Limbah",
-    desc: "Input jenis dan berat limbah organik harian yang tersedia (kg/hari).",
-  },
-  {
-    icon: Cog,
-    step: "02",
-    title: "Sistem Menghitung Potensi",
-    desc: "Kalkulator memproses data menggunakan rasio produksi biogas berbasis riset.",
-  },
-  {
-    icon: LineChart,
-    step: "03",
-    title: "Lihat Estimasi Biogas",
-    desc: "Dapatkan hasil estimasi volume biogas (m³/hari) beserta rekomendasi ukuran dome.",
-  },
-  {
-    icon: Hammer,
-    step: "04",
-    title: "Rancang Reaktor Anda",
-    desc: "Gunakan hasil perhitungan untuk merancang dan membangun reaktor biogas sendiri.",
-  },
-];
+const FALLBACK_ICONS = [ClipboardList, Cog, LineChart, Hammer, Workflow];
 
 /* ── node — icon lights up from grey to emerald once the glowing line reaches it ── */
-function StepNode({ Icon, progress, threshold }) {
+function StepNode({ Icon, progress, threshold, imageUrl }) {
   const bg = useTransform(
     progress,
     [Math.max(threshold - 0.06, 0), threshold],
@@ -53,15 +29,42 @@ function StepNode({ Icon, progress, threshold }) {
       className="absolute z-10 flex items-center justify-center w-12 h-12 rounded-full left-6 -translate-x-1/2 md:left-1/2 top-0 md:-top-1"
       style={{ background: bg, boxShadow }}
     >
-      <motion.span style={{ color }} className="flex">
-        <Icon size={20} strokeWidth={2.25} />
-      </motion.span>
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt=""
+          style={{
+            width: 24,
+            height: 24,
+            objectFit: "contain",
+            borderRadius: 4,
+          }}
+        />
+      ) : (
+        <motion.span style={{ color }} className="flex">
+          <Icon size={20} strokeWidth={2.25} />
+        </motion.span>
+      )}
     </motion.div>
   );
 }
 
 export default function HowItWorks() {
   const trackRef = useRef(null);
+  const [steps, setSteps] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    api
+      .get("/homepage/how-it-works")
+      .then(({ data }) => {
+        setSteps(data.data);
+        setLoaded(true);
+      })
+      .catch(() => {
+        setLoaded(true);
+      });
+  }, []);
 
   // ── site scrolls inside SiteFrame's custom container (Lenis-driven),
   // not `window` — useScroll needs that container passed explicitly ──
@@ -82,6 +85,8 @@ export default function HowItWorks() {
   });
   const lineScale = useTransform(progress, [0, 1], [0, 1]);
 
+  if (!loaded || steps.length === 0) return null;
+
   return (
     <section className="relative overflow-hidden py-24 max-[850px]:py-16 bg-white">
       <div className="w-full max-w-5xl mx-auto px-8 max-[767px]:px-4 relative">
@@ -91,7 +96,9 @@ export default function HowItWorks() {
             Cara Kerja
           </span>
           <h2 className="font-semibold text-[clamp(2rem,4.5vw,3.25rem)] leading-[1.12] tracking-tight text-slate-900">
-            Empat Langkah Menuju Estimasi Biogas
+            {steps.length === 4
+              ? "Empat Langkah Menuju Estimasi Biogas"
+              : `${steps.length} Langkah Menuju Estimasi Biogas`}
           </h2>
           <p className="mt-6 text-[1.0625rem] leading-relaxed text-slate-700 max-w-144 mx-auto">
             Proses yang sederhana dan cepat — dari input data hingga rancangan
@@ -122,13 +129,18 @@ export default function HowItWorks() {
           />
 
           <div className="flex flex-col gap-14 max-[850px]:gap-10">
-            {STEPS.map((item, i) => {
-              const Icon = item.icon;
+            {steps.map((item, i) => {
+              const Icon = FALLBACK_ICONS[i % FALLBACK_ICONS.length];
               const isEven = i % 2 === 1;
-              const threshold = (i + 0.5) / STEPS.length;
+              const threshold = (i + 0.5) / steps.length;
               return (
-                <Reveal key={item.step} delay={0.08 * (i + 1)} className="relative">
-                  <StepNode Icon={Icon} progress={progress} threshold={threshold} />
+                <Reveal key={item.id || i} delay={0.08 * (i + 1)} className="relative">
+                  <StepNode
+                    Icon={Icon}
+                    progress={progress}
+                    threshold={threshold}
+                    imageUrl={item.imageUrl}
+                  />
 
                   <div
                     className={`pl-20 md:pl-0 md:w-1/2 ${
@@ -141,27 +153,41 @@ export default function HowItWorks() {
                       }`}
                     >
                       <p className="font-bold text-[13px] tracking-[0.08em] text-emerald-700">
-                        LANGKAH {item.step}
+                        LANGKAH {item.stepNumber}
                       </p>
                       <h3 className="font-semibold mt-1 text-lg text-slate-900">
                         {item.title}
                       </h3>
                       <p className="mt-2 text-[0.9375rem] leading-relaxed text-slate-500">
-                        {item.desc}
+                        {item.description}
                       </p>
 
                       <div
-                        className="mt-5 flex items-center justify-center h-32 rounded-2xl"
+                        className="mt-5 flex items-center justify-center h-32 rounded-2xl overflow-hidden"
                         style={{
-                          background:
-                            "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.04))",
+                          background: item.imageUrl
+                            ? "transparent"
+                            : "linear-gradient(135deg, rgba(16,185,129,0.12), rgba(5,150,105,0.04))",
                         }}
                       >
-                        <Icon
-                          size={44}
-                          strokeWidth={1.5}
-                          className="text-emerald-600/70"
-                        />
+                        {item.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.title}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: "16px",
+                            }}
+                          />
+                        ) : (
+                          <Icon
+                            size={44}
+                            strokeWidth={1.5}
+                            className="text-emerald-600/70"
+                          />
+                        )}
                       </div>
                     </div>
                   </div>

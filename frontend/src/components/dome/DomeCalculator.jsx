@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDomeCalculations } from "../../hooks/useDomeCalculations";
 import { clampParamsToVolume } from "../../utils/volumeCap";
@@ -9,19 +9,56 @@ import MaterialsTable    from "./MaterialsTable";
 import LockedOverlay     from "./LockedOverlay";
 import LoginModal        from "../modals/LoginModal";
 import RegisterModal     from "../modals/RegisterModal";
+import VolumeLimitModal  from "../modals/VolumeLimitModal";
+import api from "../../api/axios";
 
 export default function DomeCalculator() {
   const { user } = useAuth();
-  const maxVolume = user ? 40 : 5;
+  
+  const [limits, setLimits] = useState({ guest: 5, user: 40, adminEmail: '' });
+  const [limitsLoaded, setLimitsLoaded] = useState(false);
 
   const [draftParams, setDraftParams] = useState(DEFAULT_PARAMS);
   const [params, setParams] = useState(DEFAULT_PARAMS);
-  const [modal, setModal] = useState(null); // 'login' | 'register' | null
+  const [modal, setModal] = useState(null);
+
+  useEffect(() => {
+    api.get("/settings/volume-limits")
+      .then(({ data }) => {
+        if (data.success) setLimits(data.data);
+      })
+      .catch(() => {
+      })
+      .finally(() => {
+        setLimitsLoaded(true);
+      });
+  }, []);
+
+  const maxVolume = user ? limits.user : limits.guest;
+
+  const [lastValidParams, setLastValidParams] = useState(DEFAULT_PARAMS);
 
   const rawCalc = useDomeCalculations(params);
   const isCapped = rawCalc.totalVolume > maxVolume;
-  const cappedParams = isCapped ? clampParamsToVolume(params, rawCalc.totalVolume, maxVolume) : params;
-  const cappedCalc = useDomeCalculations(cappedParams);
+
+  const draftCalc = useDomeCalculations(draftParams);
+  const draftIsCapped = draftCalc.totalVolume > maxVolume;
+
+  useEffect(() => {
+    if (!isCapped) {
+      setLastValidParams(params);
+    }
+  }, [isCapped, params]);
+
+  const displayParams = isCapped ? lastValidParams : params;
+  const cappedCalc = useDomeCalculations(displayParams);
+
+  const handleTrack = async (action) => {
+    try {
+      await api.post("/activity/track", { action });
+    } catch {
+    }
+  };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -47,7 +84,10 @@ export default function DomeCalculator() {
           <ParameterPanel params={draftParams} onChange={(newParams, apply) => {
             setDraftParams(newParams);
             if (apply) setParams(newParams);
-          }} onApply={() => setParams(draftParams)} />
+          }} onApply={() => setParams(draftParams)} user={user} onTrack={handleTrack}
+            isCapped={draftIsCapped}
+            onCapExceeded={() => setModal("volume-limit")}
+          />
         </div>
 
         {/* ── CENTER: Visualizer (Main focus, ordered first on mobile) ── */}
@@ -55,7 +95,7 @@ export default function DomeCalculator() {
           className="order-1 lg:order-2"
           style={{ height: "clamp(400px, 65vh, 800px)", position: "sticky", top: 106 }}
         >
-          <DomeVisualizer calc={cappedCalc} params={cappedParams} />
+          <DomeVisualizer calc={cappedCalc} params={displayParams} />
         </div>
 
         {/* ── RIGHT: Stats ── */}
@@ -65,11 +105,7 @@ export default function DomeCalculator() {
         >
           <StatsPanel
             calc={cappedCalc}
-            params={params}
-            isCapped={isCapped}
-            maxVolume={maxVolume}
-            user={user}
-            onLoginClick={() => setModal("login")}
+            params={displayParams}
           />
         </div>
       </div>
@@ -81,12 +117,20 @@ export default function DomeCalculator() {
         onRegister={() => setModal("register")}
         message="Buat akun atau masuk untuk melihat estimasi bahan baku"
       >
-        <MaterialsTable calc={cappedCalc} params={cappedParams} />
+        <MaterialsTable calc={cappedCalc} params={displayParams} />
       </LockedOverlay>
 
-      {/* ── Auth modals ── */}
       <LoginModal open={modal === "login"} onClose={() => setModal(null)} onSwitchToRegister={() => setModal("register")} />
       <RegisterModal open={modal === "register"} onClose={() => setModal(null)} onSwitchToLogin={() => setModal("login")} />
+      <VolumeLimitModal
+        open={modal === "volume-limit"}
+        onClose={() => setModal(null)}
+        maxVolume={maxVolume}
+        user={user}
+        adminEmail={limits.adminEmail}
+        onLoginClick={() => setModal("login")}
+        onRegisterClick={() => setModal("register")}
+      />
     </div>
   );
 }
