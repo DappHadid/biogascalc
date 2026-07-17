@@ -86,7 +86,7 @@ function RangeInput({ value, min, max, step = 1, onChange }) {
   );
 }
 
-export default function ParameterPanel({ params, onChange, onApply }) {
+export default function ParameterPanel({ params, onChange, onApply, user, onTrack, isCapped, onCapExceeded }) {
   const set = (key, apply = false) => (val) => onChange({ ...params, [key]: val }, apply);
   const isRectangle = params.shapeType === "rectangle";
 
@@ -241,7 +241,16 @@ export default function ParameterPanel({ params, onChange, onApply }) {
 
         {/* Visualisasikan Button */}
         <button
-          onClick={onApply}
+          onClick={() => {
+            if (isCapped && onCapExceeded) {
+              onCapExceeded();
+              return;
+            }
+            onApply();
+            if (user && onTrack) {
+              onTrack(params.shapeType === "rectangle" ? "visualize_rectangle" : "visualize_circular");
+            }
+          }}
           style={{
             width: "100%",
             padding: "9px 0",

@@ -1150,3 +1150,463 @@ select.admin-form-input {
     width: 100%;
   }
 }
+
+.ahp-tabs {
+  display: flex;
+  gap: 4px;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  width: fit-content;
+}
+
+.ahp-tabs__btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ahp-tabs__btn:hover {
+  color: #1e293b;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.ahp-tabs__btn--active {
+  background-color: #ffffff;
+  color: #1e293b;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.ahp-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+}
+
+.ahp-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.ahp-section__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.ahp-section__desc {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.ahp-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ahp-step-card,
+.ahp-faq-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.ahp-step-card:hover,
+.ahp-faq-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.ahp-step-card__header,
+.ahp-faq-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ahp-step-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #059669;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ahp-step-card__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.ahp-step-card__body,
+.ahp-faq-card__body {
+  padding: 18px;
+}
+
+.ahp-field {
+  margin-bottom: 16px;
+}
+
+.ahp-field:last-child {
+  margin-bottom: 0;
+}
+
+.ahp-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.ahp-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.15s;
+  box-sizing: border-box;
+}
+
+.ahp-input::placeholder {
+  color: #94a3b8;
+}
+
+.ahp-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ahp-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #1e293b;
+  outline: none;
+  transition: all 0.15s;
+  resize: vertical;
+  min-height: 70px;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+.ahp-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.ahp-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ahp-image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 16px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  background-color: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #64748b;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.ahp-image-upload:hover {
+  border-color: #3b82f6;
+  background-color: #f0f7ff;
+  color: #3b82f6;
+}
+
+.ahp-image-upload__hint {
+  font-size: 0.6875rem;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.ahp-image-preview {
+  position: relative;
+  display: inline-block;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  max-width: 240px;
+}
+
+.ahp-image-preview img {
+  display: block;
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+}
+
+.ahp-image-preview__remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.ahp-image-preview__remove:hover {
+  background-color: #dc2626;
+}
+
+.ahp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.ahp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ahp-btn--primary {
+  background-color: #f0fdf4;
+  color: #059669;
+  border: 1px solid #bbf7d0;
+}
+
+.ahp-btn--primary:hover:not(:disabled) {
+  background-color: #dcfce7;
+  border-color: #86efac;
+}
+
+.ahp-btn--save {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.ahp-btn--save:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.ahp-icon-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ahp-icon-btn:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+.ahp-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ahp-icon-btn--danger:hover:not(:disabled) {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.ahp-actions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ahp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: #94a3b8;
+  text-align: center;
+  gap: 12px;
+}
+
+.ahp-empty p {
+  font-size: 0.875rem;
+}
+
+.ahp-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 24px;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.ahp-spin {
+  animation: adminSpin 0.7s linear infinite;
+}
+
+.ahp-cat-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.ahp-cat-tabs__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ahp-cat-tabs__btn:hover {
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+.ahp-cat-tabs__btn--active {
+  background-color: #059669;
+  border-color: #059669;
+  color: #ffffff;
+}
+
+.ahp-cat-tabs__btn--active:hover {
+  background-color: #047857;
+  border-color: #047857;
+  color: #ffffff;
+}
+
+.ahp-cat-tabs__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background-color: rgba(0, 0, 0, 0.08);
+  color: inherit;
+}
+
+.ahp-cat-tabs__btn--active .ahp-cat-tabs__count {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.ahp-faq-counter__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #059669;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  font-family: var(--font-mono, monospace);
+}
+
+.ahp-faq-counter__badge--full {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+@media (max-width: 640px) {
+  .ahp-tabs {
+    width: 100%;
+  }
+
+  .ahp-tabs__btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .ahp-section__header {
+    flex-direction: column;
+  }
+
+  .ahp-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ahp-actions .ahp-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
