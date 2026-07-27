@@ -17,6 +17,12 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/domes', require('./routes/domeRoutes'));
 app.use('/api/example', require('./routes/exampleRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/homepage', require('./routes/homepageRoutes'));
+app.use('/api/activity', require('./routes/activityRoutes'));
+app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/promotions', require('./routes/promoRoutes'));
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
 app.use(express.static(frontendPath));

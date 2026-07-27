@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   TrendingUp,
+  LayoutTemplate,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -17,6 +18,8 @@ const NAV_ITEMS = [
   { label: "Manajemen Dome", href: "/admin/domes", icon: Hexagon },
   { label: "Manajemen User", href: "/admin/users", icon: Users },
   { label: "Manajemen Promosi", href: "/admin/promotions", icon: TrendingUp },
+  { label: "Kelola Beranda", href: "/admin/homepage", icon: LayoutTemplate },
+  { label: "Pengaturan", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminSidebar({ collapsed, onToggle }) {
@@ -52,7 +55,8 @@ export default function AdminSidebar({ collapsed, onToggle }) {
 
         <nav className="admin-sidebar__nav">
           {NAV_ITEMS.map((item) => {
-            if ((item.label === "Manajemen User" || item.label === "Manajemen Promosi") && !isSuperAdmin) return null;
+            const isSuperAdminOnly = ["Manajemen User", "Manajemen Promosi", "Kelola Beranda", "Pengaturan"].includes(item.label);
+            if (isSuperAdminOnly && !isSuperAdmin) return null;
 
             const Icon = item.icon;
             const isActive = pathname === item.href;

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import SiteFrame from "./components/layouts/SiteFrame";
 import Navbar from "./components/layouts/Navbar";
@@ -13,11 +14,14 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminDomes from "./pages/admin/AdminDomes";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPromotions from "./pages/admin/AdminPromotions";
+import AdminHomepage from "./pages/admin/AdminHomepage";
+import AdminSettings from "./pages/admin/AdminSettings";
 import SuperAdminRoute from "./components/auth/SuperAdminRoute";
 
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" richColors />
       <AuthProvider>
         <Routes>
           <Route
@@ -60,6 +64,16 @@ function App() {
             <Route path="promotions" element={
               <SuperAdminRoute>
                 <AdminPromotions />
+              </SuperAdminRoute>
+            } />
+            <Route path="homepage" element={
+              <SuperAdminRoute>
+                <AdminHomepage />
+              </SuperAdminRoute>
+            } />
+            <Route path="settings" element={
+              <SuperAdminRoute>
+                <AdminSettings />
               </SuperAdminRoute>
             } />
           </Route>
