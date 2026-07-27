@@ -103,7 +103,7 @@ export default function Footer() {
                   marginBottom: "clamp(24px, 5vw, 56px)",
                 }}
               >
-                Mulai hitung potensi biogas Anda hari ini
+                Mulai Hitung Potensi Biogas Anda Hari Ini
               </h2>
 
               <form

@@ -10,18 +10,6 @@ const STATS = [
 export default function About() {
   return (
     <section className="relative overflow-hidden py-24 max-[850px]:py-16 bg-white">
-      {/* decorative gradient blobs */}
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none w-130 h-130 -top-55 -right-40 rounded-full blur-[10px]"
-        style={{ background: "radial-gradient(circle, rgba(16,185,129,0.20) 0%, rgba(16,185,129,0) 70%)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute pointer-events-none w-95 h-95 -bottom-45 -left-35 rounded-full blur-[10px]"
-        style={{ background: "radial-gradient(circle, rgba(5,150,105,0.14) 0%, rgba(5,150,105,0) 70%)" }}
-      />
-
       <div className="w-full max-w-7xl mx-auto px-8 max-[767px]:px-4 relative">
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-14 items-start">
           <Reveal>

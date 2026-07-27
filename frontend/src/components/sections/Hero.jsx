@@ -48,14 +48,22 @@ export default function Hero() {
       {/* Overlay gelap tipis di atas foto agar zigzag putih tetap kontras */}
       <div className="absolute inset-x-0 bottom-0 h-32 max-[850px]:h-24 bg-linear-to-b from-transparent to-black/50 pointer-events-none" />
 
-      {/* Divider zigzag putih menyatu ke section berikutnya (bg-white) */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-6 max-[850px]:h-4 bg-white pointer-events-none"
-        style={{
-          clipPath:
-            "polygon(0% 100%, 0.000% 0%, 1.111% 70%, 2.222% 0%, 3.333% 70%, 4.444% 0%, 5.556% 70%, 6.667% 0%, 7.778% 70%, 8.889% 0%, 10.000% 70%, 11.111% 0%, 12.222% 70%, 13.333% 0%, 14.444% 70%, 15.556% 0%, 16.667% 70%, 17.778% 0%, 18.889% 70%, 20.000% 0%, 21.111% 70%, 22.222% 0%, 23.333% 70%, 24.444% 0%, 25.556% 70%, 26.667% 0%, 27.778% 70%, 28.889% 0%, 30.000% 70%, 31.111% 0%, 32.222% 70%, 33.333% 0%, 34.444% 70%, 35.556% 0%, 36.667% 70%, 37.778% 0%, 38.889% 70%, 40.000% 0%, 41.111% 70%, 42.222% 0%, 43.333% 70%, 44.444% 0%, 45.556% 70%, 46.667% 0%, 47.778% 70%, 48.889% 0%, 50.000% 70%, 51.111% 0%, 52.222% 70%, 53.333% 0%, 54.444% 70%, 55.556% 0%, 56.667% 70%, 57.778% 0%, 58.889% 70%, 60.000% 0%, 61.111% 70%, 62.222% 0%, 63.333% 70%, 64.444% 0%, 65.556% 70%, 66.667% 0%, 67.778% 70%, 68.889% 0%, 70.000% 70%, 71.111% 0%, 72.222% 70%, 73.333% 0%, 74.444% 70%, 75.556% 0%, 76.667% 70%, 77.778% 0%, 78.889% 70%, 80.000% 0%, 81.111% 70%, 82.222% 0%, 83.333% 70%, 84.444% 0%, 85.556% 70%, 86.667% 0%, 87.778% 70%, 88.889% 0%, 90.000% 70%, 91.111% 0%, 92.222% 70%, 93.333% 0%, 94.444% 70%, 95.556% 0%, 96.667% 70%, 97.778% 0%, 98.889% 70%, 100.000% 0%, 100% 100%)",
-        }}
-      />
+      {/* Divider bentuk Layered Fluid Wave (Inovasi organik 3 lapis) */}
+      <div className="absolute inset-x-0 bottom-0 w-full overflow-hidden leading-[0] pointer-events-none">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+          className="relative block w-full h-[80px] md:h-[120px] lg:h-[180px] -mb-[1px]"
+        >
+          {/* Layer 1 (Paling belakang, opasitas 30%) */}
+          <path fill="rgba(255,255,255,0.3)" d="M0,96L80,112C160,128,320,160,480,154.7C640,149,800,107,960,101.3C1120,96,1280,128,1360,144L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+          {/* Layer 2 (Tengah, opasitas 60%) */}
+          <path fill="rgba(255,255,255,0.6)" d="M0,192L80,181.3C160,171,320,149,480,165.3C640,181,800,235,960,234.7C1120,235,1280,181,1360,154.7L1440,128L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+          {/* Layer 3 (Utama, solid putih) */}
+          <path fill="#ffffff" d="M0,256L80,240C160,224,320,192,480,197.3C640,203,800,245,960,245.3C1120,245,1280,203,1360,181.3L1440,160L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+        </svg>
+      </div>
 
       <div className="relative w-full max-w-7xl mx-auto px-8 max-[767px]:px-4 pt-52 max-[850px]:pt-40 text-center">
         {/* ── Headline dengan gambar disisipkan di tengah teks ── */}
@@ -63,7 +71,7 @@ export default function Hero() {
           initial={fadeUp.initial}
           animate={fadeUp.animate}
           transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="font-medium leading-[1.1] tracking-tight text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.55)]"
+          className="font-semibold leading-[1.12] tracking-tight text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.55)]"
         >
           <motion.span layout className="flex flex-wrap items-center justify-center gap-3 max-[600px]:gap-2 text-6xl max-[1024px]:text-5xl max-[600px]:text-3xl">
             HITUNG POTENSI
