@@ -14,6 +14,13 @@ import {
   RefreshCw,
   ChevronDown
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 const substrates = [
   { id: "cow_manure", name: "Kotoran Sapi", yieldFactor: 0.04 },
@@ -78,15 +85,7 @@ export default function Calculator() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 pt-32 pb-16 px-4 sm:px-6 selection:bg-emerald-100 selection:text-emerald-900">
-      
-      {/* Background ambient pattern/gradient */}
-      <div className="fixed inset-0 z-0 pointer-events-none flex justify-center items-start overflow-hidden opacity-40">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-50 blur-[120px] rounded-full" />
-        <div className="absolute top-[20%] right-[-10%] w-[30%] h-[30%] bg-teal-50 blur-[100px] rounded-full" />
-      </div>
-
       <div className="relative z-10 max-w-5xl mx-auto space-y-12">
-        
         {/* Header */}
         <div className="text-center space-y-4 relative">
           <motion.div 
@@ -139,20 +138,19 @@ export default function Calculator() {
                   <label className="text-xs font-bold text-gray-600 flex items-center gap-2">
                     <Leaf className="w-3.5 h-3.5 text-emerald-600" /> Jenis Substrat
                   </label>
-                  <div className="relative">
-                    <select
-                      name="substrate"
-                      value={formData.substrate}
-                      onChange={handleInputChange}
-                      className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all appearance-none cursor-pointer font-medium"
-                      required
-                    >
+                  <Select 
+                    value={formData.substrate} 
+                    onValueChange={(value) => handleInputChange({ target: { name: "substrate", value }})}
+                  >
+                    <SelectTrigger className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3 h-[46px] text-sm text-gray-800 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all cursor-pointer font-medium shadow-none">
+                      <SelectValue placeholder="Pilih Jenis Substrat" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {substrates.map((s) => (
-                        <option key={s.id} value={s.id}>{s.name}</option>
+                        <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                       ))}
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                  </div>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Quantity */}

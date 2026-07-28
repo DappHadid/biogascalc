@@ -50,7 +50,6 @@ function StepNode({ Icon, progress, threshold, imageUrl }) {
 }
 
 export default function HowItWorks() {
-  const trackRef = useRef(null);
   const [steps, setSteps] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -66,26 +65,32 @@ export default function HowItWorks() {
       });
   }, []);
 
-  // ── site scrolls inside SiteFrame's custom container (Lenis-driven),
-  // not `window` — useScroll needs that container passed explicitly ──
-  const [scrollContainer, setScrollContainer] = useState(null);
-  useEffect(() => {
-    setScrollContainer({ current: document.querySelector(".site-frame-scroll") });
-  }, []);
+  if (!loaded || steps.length === 0) return null;
+
+  return <HowItWorksContent steps={steps} />;
+}
+
+function HowItWorksContent({ steps }) {
+  const trackRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  
+  if (typeof document !== "undefined" && !scrollContainerRef.current) {
+    scrollContainerRef.current = document.querySelector(".site-frame-scroll");
+  }
 
   const { scrollYProgress } = useScroll({
     target: trackRef,
-    container: scrollContainer ?? undefined,
+    container: scrollContainerRef.current ? scrollContainerRef : undefined,
     offset: ["start center", "end center"],
   });
+  
   const progress = useSpring(scrollYProgress, {
     stiffness: 90,
     damping: 22,
     mass: 0.4,
   });
+  
   const lineScale = useTransform(progress, [0, 1], [0, 1]);
-
-  if (!loaded || steps.length === 0) return null;
 
   return (
     <section className="relative overflow-hidden py-24 max-[850px]:py-16 bg-white">

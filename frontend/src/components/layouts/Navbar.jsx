@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { label: "Lokasi", href: "/lokasi" },
   { label: "Dome", href: "/rancang-dome" },
   { label: "Kalkulator", href: "/kalkulator-limbah" },
+  { label: "Kontak", href: "/contact" },
 ];
 
 export default function Navbar() {
@@ -100,7 +101,7 @@ export default function Navbar() {
             <Link to="/" className="flex items-center gap-3" style={{ textDecoration: "none" }}>
               <img src="/Logo.png" alt="OWREN logo" className="w-8 h-8 rounded-full object-cover" style={{ border: "1px solid #2a2a2a" }} />
               <span className="block font-semibold tracking-tight" style={{ fontSize: "0.9375rem", color: "#ffffff", lineHeight: 1.2 }}>
-                Owren.tech
+                Owren
               </span>
             </Link>
 
