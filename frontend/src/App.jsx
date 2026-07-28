@@ -17,6 +17,8 @@ import AdminPromotions from "./pages/admin/AdminPromotions";
 import AdminHomepage from "./pages/admin/AdminHomepage";
 import AdminSettings from "./pages/admin/AdminSettings";
 import SuperAdminRoute from "./components/auth/SuperAdminRoute";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
                       <Route path="/lokasi" element={<Location />} />
                       <Route path="/rancang-dome" element={<Dome />} />
                       <Route path="/kalkulator-limbah" element={<Calculator />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
                   </main>
                 </div>

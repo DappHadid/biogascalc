@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { label: "Lokasi", href: "/lokasi" },
   { label: "Dome", href: "/rancang-dome" },
   { label: "Kalkulator", href: "/kalkulator-limbah" },
+  { label: "Kontak", href: "/contact" },
 ];
 
 export default function Navbar() {
