@@ -1,5 +1,61 @@
 import React from "react";
 import { motion } from "framer-motion";
+
+const MemberCard = ({ member, index }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    whileInView={{ opacity: 1 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.8, delay: index * 0.2 }}
+    className="group relative flex flex-col items-center justify-end overflow-hidden rounded-xl p-8 text-center transition-all duration-300 ease-in-out hover:scale-[1.02] transform-gpu bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
+  >
+    {/* Background wave animation */}
+    <div
+      className="absolute bottom-0 left-0 right-0 h-[65%] origin-bottom scale-y-0 transform rounded-t-[50%] bg-[#1a1a1a] transition-transform duration-500 ease-out group-hover:scale-y-100"
+      style={{ transitionDelay: `${index * 50}ms` }}
+    />
+
+    {/* Member Image */}
+    <div
+      className="relative z-10 h-40 w-40 overflow-hidden rounded-full bg-gray-100 transition-all duration-500 ease-out group-hover:scale-105 mb-6 border-4 border-transparent group-hover:border-[#1a1a1a]"
+      style={{ transitionDelay: `${index * 50}ms` }}
+    >
+      <img
+        src={member.imageSrc}
+        alt={member.name}
+        className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+      />
+    </div>
+
+    <h3 className="relative z-10 text-base font-bold text-slate-900 group-hover:text-white transition-colors duration-300 uppercase tracking-wider">
+      {member.name}
+    </h3>
+    <p className="relative z-10 text-sm text-slate-500 group-hover:text-gray-400 transition-colors duration-300 mt-1">
+      {member.designation}
+    </p>
+
+    {/* Social Links for individual members */}
+    {member.socialLinks && member.socialLinks.length > 0 && (
+      <div className="relative z-10 mt-6 flex gap-4 opacity-0 translate-y-4 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
+        {member.socialLinks.map((link, linkIndex) => {
+          const Icon = link.icon;
+          return (
+            <a
+              key={linkIndex}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-400 hover:text-emerald-600 transition-colors"
+            >
+              <Icon className="h-4 w-4" />
+            </a>
+          );
+        })}
+      </div>
+    )}
+  </motion.div>
+);
+
 export const TeamSection = React.forwardRef(
   (
     {
@@ -97,62 +153,29 @@ export const TeamSection = React.forwardRef(
           )}
 
           {/* Team Members Grid */}
-          <div className="relative z-10 grid w-full grid-cols-1 gap-8 md:grid-cols-3 lg:gap-12 mt-8">
-            {members.map((member, index) => (
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                key={index}
-                className="group relative flex flex-col items-center justify-end overflow-hidden rounded-xl p-8 text-center transition-all duration-300 ease-in-out hover:scale-[1.02] transform-gpu bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
-              >
-                {/* Background wave animation */}
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-[65%] origin-bottom scale-y-0 transform rounded-t-[50%] bg-[#1a1a1a] transition-transform duration-500 ease-out group-hover:scale-y-100"
-                  style={{ transitionDelay: `${index * 50}ms` }}
-                />
+          <div className="relative z-10 w-full mt-8 flex flex-col items-center">
+            {(() => {
+              const leader = members.find(m => m.name.includes("CHOERUDIN"));
+              const otherMembers = members.filter(m => !m.name.includes("CHOERUDIN"));
 
-                {/* Member Image */}
-                <div
-                  className="relative z-10 h-40 w-40 overflow-hidden rounded-full bg-gray-100 transition-all duration-500 ease-out group-hover:scale-105 mb-6 border-4 border-transparent group-hover:border-[#1a1a1a]"
-                  style={{ transitionDelay: `${index * 50}ms` }}
-                >
-                  <img
-                    src={member.imageSrc}
-                    alt={member.name}
-                    className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                  />
-                </div>
+              return (
+                <>
+                  {/* Leader */}
+                  {leader && (
+                    <div className="w-full max-w-[320px] mb-12">
+                      <MemberCard member={leader} index={0} />
+                    </div>
+                  )}
 
-                <h3 className="relative z-10 text-base font-bold text-slate-900 group-hover:text-white transition-colors duration-300 uppercase tracking-wider">
-                  {member.name}
-                </h3>
-                <p className="relative z-10 text-sm text-slate-500 group-hover:text-gray-400 transition-colors duration-300 mt-1">
-                  {member.designation}
-                </p>
-
-                {/* Social Links for individual members */}
-                {member.socialLinks && member.socialLinks.length > 0 && (
-                  <div className="relative z-10 mt-6 flex gap-4 opacity-0 translate-y-4 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
-                    {member.socialLinks.map((link, linkIndex) => {
-                      const Icon = link.icon;
-                      return (
-                        <a
-                          key={linkIndex}
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-slate-400 hover:text-emerald-600 transition-colors"
-                        >
-                          <Icon className="h-4 w-4" />
-                        </a>
-                      );
-                    })}
+                  {/* Other Members Grid */}
+                  <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-3 lg:gap-12">
+                    {otherMembers.map((member, index) => (
+                      <MemberCard key={index} member={member} index={index + 1} />
+                    ))}
                   </div>
-                )}
-              </motion.div>
-            ))}
+                </>
+              );
+            })()}
           </div>
         </div>
       </section>

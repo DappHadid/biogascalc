@@ -16,7 +16,7 @@ const FEATURES = [
   {
     icon: Receipt,
     accent: "#059669",
-    title: "Estimasi Bahan & Biaya",
+    title: "Estimasi Bahan",
     desc: "Dapatkan rincian kebutuhan semen, pasir, batu bata, hingga besi tulangan otomatis dari ukuran dome yang Anda rancang.",
     linkText: "Lihat Estimasi",
     href: "/rancang-dome",
