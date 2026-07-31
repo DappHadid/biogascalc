@@ -54,7 +54,7 @@ export default function Calculator() {
     
     setTimeout(() => {
       const quantity = parseFloat(formData.quantity) || 0;
-      const dryMatter = parseFloat(formData.dryMatter) || 0;
+      const dryMatter = parseFloat(formData.dryMatter) || 100;
       const selectedSubstrate = substrates.find(s => s.id === formData.substrate);
       
       const effectiveYield = selectedSubstrate ? selectedSubstrate.yieldFactor : 0.04;
@@ -88,14 +88,6 @@ export default function Calculator() {
       <div className="relative z-10 max-w-5xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4 relative">
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 bg-white shadow-sm text-xs font-semibold text-gray-500"
-          >
-            <CalcIcon className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Biogas Calculator Engine</span>
-          </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -172,7 +164,7 @@ export default function Calculator() {
                 </div>
 
                 {/* Dry Matter */}
-                <div className="space-y-2">
+                <div className="hidden space-y-2">
                   <label className="text-xs font-bold text-gray-600 flex items-center gap-2">
                     <Droplets className="w-3.5 h-3.5 text-emerald-600" /> Kadar Kering (%)
                   </label>
@@ -186,7 +178,6 @@ export default function Calculator() {
                     step="0.1"
                     placeholder="0.0"
                     className="w-full bg-gray-50/50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:bg-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
-                    required
                   />
                 </div>
               </div>

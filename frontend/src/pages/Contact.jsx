@@ -1,6 +1,6 @@
 import React from "react";
 import { TeamSection } from "../components/ui/team-section";
-import { MessageCircle, Users, Camera, Video, Code, Briefcase } from "lucide-react";
+import { MessageCircle, Users, Camera, Video, Code, Briefcase, MapPin, Globe } from "lucide-react";
 
 import Footer from "../components/layouts/Footer";
 
@@ -8,7 +8,7 @@ export default function Contact() {
   const teamMembers = [
     {
       name: "Dr. CHOERUDIN S.T., M.T",
-      designation: "Team Member",
+      designation: "Ketua PKM",
       imageSrc: "/CHOERUDIN.webp",
       socialLinks: [
         { icon: MessageCircle, href: "#" },
@@ -17,7 +17,7 @@ export default function Contact() {
     },
     {
       name: "Dr. SALAFUDIN S.T, M.Sc",
-      designation: "Team Member",
+      designation: "Dosen Pembimbing",
       imageSrc: "/SALAFUDIN.webp",
       socialLinks: [
         { icon: Code, href: "#" },
@@ -26,7 +26,7 @@ export default function Contact() {
     },
     {
       name: "ASEP RIZAL NURJAMAN S.KOM.,M.KOM",
-      designation: "Team Member",
+      designation: "Dosen Pembimbing",
       imageSrc: "/ASEP_RIZAL.webp",
       socialLinks: [
         { icon: Users, href: "#" },
@@ -35,7 +35,7 @@ export default function Contact() {
     },
     {
       name: "EUNEKE WIDYANINGSIH S.T., M.T",
-      designation: "Team Member",
+      designation: "Dosen Pembimbing",
       imageSrc: "/EUNEKE_WIDYANINGSIH.webp",
       socialLinks: [
         { icon: MessageCircle, href: "#" },
@@ -44,16 +44,16 @@ export default function Contact() {
     },
     {
       name: "DAFFA MAULANA IBRAHIM",
-      designation: "Team Member",
+      designation: "Anggota Tim",
       imageSrc: "/DAFFA.webp",
       socialLinks: [
         { icon: Code, href: "#" },
         { icon: Briefcase, href: "#" },
       ],
     },
-        {
+    {
       name: "MUHAMMAD AXEL SYAHWIN",
-      designation: "Team Member",
+      designation: "Anggota Tim",
       imageSrc: "/AXEL.webp",
       socialLinks: [
         { icon: Code, href: "#" },
@@ -63,10 +63,9 @@ export default function Contact() {
   ];
 
   const mainSocialLinks = [
-    { icon: MessageCircle, href: "#" },
-    { icon: Users, href: "#" },
-    { icon: Camera, href: "#" },
-    { icon: Video, href: "#" },
+    { icon: MapPin, href: "https://maps.app.goo.gl/w2yze2uSVrv47Hti6" },
+    { icon: Video, href: "https://youtu.be/3tIq8IRp3ZU?si=yAe1Z7kVk4vtkwPg" },
+    { icon: Globe, href: "https://www.itenas.ac.id/" },
   ];
 
   return (

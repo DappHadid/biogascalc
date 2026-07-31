@@ -2,7 +2,6 @@ import { Users } from "lucide-react";
 import Reveal from "./Reveal";
 
 const LOGOS = [
-  { src: "/589180084_17869033776483190_1218862795343478522_n.webp", alt: "Kampus Merdeka" },
   { src: "/diktisaintek.webp", alt: "Diktisaintek" },
   { src: "/itenas.webp", alt: "Itenas" },
   { src: "/lppmitenas.webp", alt: "LPPM Itenas" },
@@ -49,6 +48,29 @@ export default function About() {
                   className="h-16 md:h-20 w-auto object-contain drop-shadow-sm" 
                 />
               ))}
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Dikembangkan Oleh Section */}
+        <Reveal delay={0.3}>
+          <div className="mt-12 pt-10 border-t border-slate-100 w-full flex flex-col items-center">
+            <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-6">
+              Dikembangkan Oleh
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
+              <a href="https://www.itenas.ac.id/prodi/sistem-informasi" target="_blank" rel="noopener noreferrer" className="text-slate-600 font-medium hover:text-emerald-600 transition-colors duration-300">
+                Sistem Informasi
+              </a>
+              <a href="https://www.itenas.ac.id/prodi/teknik-kimia" target="_blank" rel="noopener noreferrer" className="text-slate-600 font-medium hover:text-emerald-600 transition-colors duration-300">
+                Teknik Kimia
+              </a>
+              <a href="https://www.itenas.ac.id/prodi/teknik-sipil" target="_blank" rel="noopener noreferrer" className="text-slate-600 font-medium hover:text-emerald-600 transition-colors duration-300">
+                Teknik Sipil
+              </a>
+              <a href="https://www.itenas.ac.id/prodi/teknik-mesin" target="_blank" rel="noopener noreferrer" className="text-slate-600 font-medium hover:text-emerald-600 transition-colors duration-300">
+                Teknik Mesin
+              </a>
             </div>
           </div>
         </Reveal>
