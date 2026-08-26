@@ -1,0 +1,35 @@
+{
+  "name": "biogascalc",
+  "version": "1.0.0",
+  "description": "BiogasCalc — Biogas Calculator Application",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd backend && npm install && cd ../frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && node server.js",
+    "seed:all": "cd backend && node scripts/seedSuperAdmin.js && node scripts/seedAdmin.js && node scripts/seedUser.js"
+  },
+  "keywords": [
+    "biogas",
+    "calculator"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "playwright": "^1.61.0"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "ogl": "^1.0.11",
+    "react": "^19.0.0-rc.1",
+    "react-dom": "^19.0.0-rc.1",
+    "react-leaflet": "^5.0.0-rc.2",
+    "sonner": "^2.0.7",
+    "three": "^0.185.1"
+  }
+}

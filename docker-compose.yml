@@ -1,0 +1,63 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: biogascalc-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=biogascalc
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - biogascalc-network
+
+  # Express.js Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: biogascalc-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=biogascalc
+      - DB_PORT=3306
+      - NODE_ENV=development
+    depends_on:
+      - mysql
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - biogascalc-network
+
+  # React + Vite Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: biogascalc-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - biogascalc-network
+
+volumes:
+  mysql_data:
+
+networks:
+  biogascalc-network:
+    driver: bridge

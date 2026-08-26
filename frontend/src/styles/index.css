@@ -1,0 +1,122 @@
+/* BioGasCalc — index.css
+   Styling dilakukan langsung via Tailwind v4 utility classes di komponen.
+   File ini hanya berisi hal-hal yang TIDAK bisa diekspresikan sebagai
+   utility class: import Tailwind, font, dan perilaku struktural untuk
+   SiteFrame / Navbar / Footer / Leaflet (lihat komentar per-blok).
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'SF Pro';
+  src: url('/fonts/SF-Pro.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'SF Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   SITE FRAME — dipakai oleh SiteFrame.jsx untuk menyembunyikan
+   scrollbar bawaan (scroll tetap jalan via wheel/touch/keyboard).
+   ============================================================ */
+
+.site-frame-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.site-frame-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================
+   MAIN CONTENT OFFSET — dipakai oleh halaman yang berada di
+   bawah Navbar fixed (pill mengambang), kompensasi tinggi navbar.
+   ============================================================ */
+
+.main-content-offset {
+  padding-top: 90px;
+}
+
+@media (max-width: 850px) {
+  .main-content-offset {
+    padding-top: 72px;
+  }
+}
+
+/* ============================================================
+   LEAFLET OVERRIDES — dipakai oleh Location.jsx (peta sebaran),
+   menyesuaikan popup/attribution bawaan Leaflet dengan tampilan situs.
+   ============================================================ */
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  border: 1px solid #e1e5e8 !important;
+  box-shadow: rgba(0, 30, 43, 0.12) 0px 12px 24px -4px !important;
+  padding: 0 !important;
+  font-family: 'SF Pro', -apple-system, sans-serif !important;
+}
+
+.leaflet-popup-content {
+  margin: 14px 16px !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup-tip-container {
+  filter: drop-shadow(0 2px 2px rgba(0, 30, 43, 0.08));
+}
+
+.leaflet-control-attribution {
+  font-family: 'SF Pro', sans-serif !important;
+  font-size: 11px !important;
+  color: #a8b3bc !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(4px);
+}
+
+.leaflet-control-attribution a {
+  color: #5c6c7a !important;
+}
+
+.leaflet-control-zoom a {
+  font-family: inherit !important;
+  color: #001e2b !important;
+  border-color: #e1e5e8 !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: #f9fbfa !important;
+}
+
+/* ============================================================
+   REDUCED MOTION — Accessibility
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
