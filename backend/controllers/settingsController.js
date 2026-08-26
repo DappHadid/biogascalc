@@ -1,5 +1,14 @@
 const { AppSetting } = require('../models');
 
+const DEFAULT_DOME_MATERIALS = [
+  { name: 'Semen', coefficientPerM2: 15, unit: 'kg' },
+  { name: 'Pasir', coefficientPerM2: 0.03, unit: 'm³' },
+  { name: 'Batu Bata / Batako', coefficientPerM2: 60, unit: 'buah' },
+  { name: 'Besi Tulangan (Rebar)', coefficientPerM2: 2.5, unit: 'kg' },
+  { name: 'Kerikil / Split', coefficientPerM2: 0.02, unit: 'm³' },
+  { name: 'Cat Pelapis Anti Bocor', coefficientPerM2: 0.12, unit: 'liter' },
+];
+
 const getVolumeLimits = async (req, res, next) => {
   try {
     const settings = await AppSetting.findAll({
@@ -89,9 +98,74 @@ const updatePromoThreshold = async (req, res, next) => {
   }
 };
 
+const getDomeMaterials = async (req, res, next) => {
+  try {
+    const setting = await AppSetting.findByPk('DOME_MATERIALS');
+    let materials = DEFAULT_DOME_MATERIALS;
+
+    if (setting) {
+      try {
+        materials = JSON.parse(setting.value);
+      } catch {
+        materials = DEFAULT_DOME_MATERIALS;
+      }
+    }
+
+    res.json({ success: true, data: materials });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateDomeMaterials = async (req, res, next) => {
+  try {
+    const { materials } = req.body;
+
+    if (!Array.isArray(materials)) {
+      res.status(400);
+      return next(new Error('Data materials harus berupa array.'));
+    }
+
+    for (let i = 0; i < materials.length; i++) {
+      const m = materials[i];
+      if (!m.name || typeof m.name !== 'string' || m.name.trim() === '') {
+        res.status(400);
+        return next(new Error(`Item ke-${i + 1}: nama bahan wajib diisi.`));
+      }
+      if (typeof m.coefficientPerM2 !== 'number' || m.coefficientPerM2 < 0) {
+        res.status(400);
+        return next(new Error(`Item ke-${i + 1} (${m.name}): koefisien harus berupa angka >= 0.`));
+      }
+      if (!m.unit || typeof m.unit !== 'string' || m.unit.trim() === '') {
+        res.status(400);
+        return next(new Error(`Item ke-${i + 1} (${m.name}): satuan wajib diisi.`));
+      }
+    }
+
+    const cleanMaterials = materials.map(m => ({
+      name: m.name.trim(),
+      coefficientPerM2: m.coefficientPerM2,
+      unit: m.unit.trim(),
+    }));
+
+    await AppSetting.upsert({
+      key: 'DOME_MATERIALS',
+      value: JSON.stringify(cleanMaterials),
+      description: 'Dome material estimation coefficients (JSON array)',
+    });
+
+    res.json({ success: true, message: 'Data estimasi bahan baku berhasil diperbarui.', data: cleanMaterials });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getVolumeLimits,
   updateVolumeLimits,
   getPromoThreshold,
   updatePromoThreshold,
+  getDomeMaterials,
+  updateDomeMaterials,
+  DEFAULT_DOME_MATERIALS,
 };

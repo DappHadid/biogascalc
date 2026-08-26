@@ -15,15 +15,15 @@ export default function Contact() {
         { icon: Briefcase, href: "#" },
       ],
     },
-    {
-      name: "Dr. SALAFUDIN S.T, M.Sc",
-      designation: "Dosen Pembimbing",
-      imageSrc: "/SALAFUDIN.webp",
-      socialLinks: [
-        { icon: Code, href: "#" },
-        { icon: MessageCircle, href: "#" },
-      ],
-    },
+    // {
+    //   name: "Dr. SALAFUDIN S.T, M.Sc",
+    //   designation: "Dosen Pembimbing",
+    //   imageSrc: "/SALAFUDIN.webp",
+    //   socialLinks: [
+    //     { icon: Code, href: "#" },
+    //     { icon: MessageCircle, href: "#" },
+    //   ],
+    // },
     {
       name: "ASEP RIZAL NURJAMAN S.KOM.,M.KOM",
       designation: "Dosen Pembimbing",

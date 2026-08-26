@@ -5,27 +5,17 @@
    be refined against real project data.
    ------------------------------------------------------------ */
 
-const CEMENT_KG_PER_M2   = 15;   // plaster + shell mix
-const SAND_M3_PER_M2     = 0.03;
-const BRICK_PER_M2       = 60;   // batu bata/batako per m² of shell
-const REBAR_KG_PER_M2    = 2.5;  // reinforcement for shell + ring beam
-const GRAVEL_M3_PER_M2   = 0.02;
-const PAINT_L_PER_M2     = 0.12; // waterproof coating
-
-function estimateMaterials(surfaceArea) {
+function estimateMaterials(surfaceArea, materialsConfig) {
   const SA = Math.max(0, surfaceArea);
-  return [
-    { name: "Semen", qty: SA * CEMENT_KG_PER_M2, unit: "kg" },
-    { name: "Pasir", qty: SA * SAND_M3_PER_M2, unit: "m³" },
-    { name: "Batu Bata / Batako", qty: Math.ceil(SA * BRICK_PER_M2), unit: "buah" },
-    { name: "Besi Tulangan (Rebar)", qty: SA * REBAR_KG_PER_M2, unit: "kg" },
-    { name: "Kerikil / Split", qty: SA * GRAVEL_M3_PER_M2, unit: "m³" },
-    { name: "Cat Pelapis Anti Bocor", qty: SA * PAINT_L_PER_M2, unit: "liter" },
-  ];
+  return materialsConfig.map(m => ({
+    name: m.name,
+    qty: m.unit === "buah" ? Math.ceil(SA * m.coefficientPerM2) : SA * m.coefficientPerM2,
+    unit: m.unit,
+  }));
 }
 
-export default function MaterialsTable({ calc }) {
-  const materials = estimateMaterials(calc.surfaceArea);
+export default function MaterialsTable({ calc, materialsConfig = [] }) {
+  const materials = estimateMaterials(calc.surfaceArea, materialsConfig);
 
   return (
     <div
@@ -77,44 +67,52 @@ export default function MaterialsTable({ calc }) {
             </tr>
           </thead>
           <tbody>
-            {materials.map((m) => (
-              <tr key={m.name}>
-                <td
-                  style={{
-                    padding: "10px 12px",
-                    fontSize: "0.875rem",
-                    fontWeight: 500,
-                    color: "#001e2b",
-                    borderBottom: "1px solid #f0f3f2",
-                  }}
-                >
-                  {m.name}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 12px",
-                    fontSize: "0.875rem",
-                    fontWeight: 600,
-                    color: "#00684a",
-                    textAlign: "right",
-                    fontVariantNumeric: "tabular-nums",
-                    borderBottom: "1px solid #f0f3f2",
-                  }}
-                >
-                  {m.qty.toLocaleString("id-ID", { maximumFractionDigits: 1 })}
-                </td>
-                <td
-                  style={{
-                    padding: "10px 12px",
-                    fontSize: "0.8125rem",
-                    color: "#7c8c9a",
-                    borderBottom: "1px solid #f0f3f2",
-                  }}
-                >
-                  {m.unit}
+            {materials.length === 0 ? (
+              <tr>
+                <td colSpan={3} style={{ textAlign: "center", padding: "20px 12px", color: "#a8b3bc", fontSize: "0.875rem" }}>
+                  Data bahan baku belum tersedia.
                 </td>
               </tr>
-            ))}
+            ) : (
+              materials.map((m) => (
+                <tr key={m.name}>
+                  <td
+                    style={{
+                      padding: "10px 12px",
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      color: "#001e2b",
+                      borderBottom: "1px solid #f0f3f2",
+                    }}
+                  >
+                    {m.name}
+                  </td>
+                  <td
+                    style={{
+                      padding: "10px 12px",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      color: "#00684a",
+                      textAlign: "right",
+                      fontVariantNumeric: "tabular-nums",
+                      borderBottom: "1px solid #f0f3f2",
+                    }}
+                  >
+                    {m.qty.toLocaleString("id-ID", { maximumFractionDigits: 1 })}
+                  </td>
+                  <td
+                    style={{
+                      padding: "10px 12px",
+                      fontSize: "0.8125rem",
+                      color: "#7c8c9a",
+                      borderBottom: "1px solid #f0f3f2",
+                    }}
+                  >
+                    {m.unit}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -125,3 +123,4 @@ export default function MaterialsTable({ calc }) {
     </div>
   );
 }
+
