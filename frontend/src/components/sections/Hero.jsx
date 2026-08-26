@@ -47,7 +47,6 @@ export default function Hero() {
         loop
         muted
         playsInline
-        poster="/hero-background.webp"
       />
 
       {/* Efek gelap tipis hanya di bawah navbar, tidak menutupi seluruh foto */}
