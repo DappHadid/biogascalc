@@ -38,10 +38,18 @@ export default function Hero() {
   }, []);
 
   return (
-    <section
-      className="relative min-h-screen flex items-start bg-[#022c22] bg-cover bg-center overflow-hidden"
-      style={{ backgroundImage: "url('/hero-background.webp')" }}
-    >
+    <section className="relative min-h-screen flex items-start bg-[#022c22] overflow-hidden">
+      {/* Video background, auto-play looping */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        src="/biogas_video.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="/hero-background.webp"
+      />
+
       {/* Efek gelap tipis hanya di bawah navbar, tidak menutupi seluruh foto */}
       <div className="absolute inset-x-0 top-0 h-72 bg-linear-to-b from-black/65 via-black/20 to-transparent pointer-events-none" />
 

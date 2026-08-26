@@ -221,18 +221,39 @@ function AutoRotate({ enabled }) {
 }
 
 /* ── Scene (inside Canvas) ───────────────────────────────────*/
+const PERSON_HEIGHT = 2;
+const PERSON_GAP = 0.6;
+const PERSON_RADIUS = 0.35; // rough half-width of the human figure's bounding box
+
 function Scene({ calc, params }) {
   const isRectangle = calc.shape === "rectangle";
+  const showPerson = params.showPerson !== false;
 
   const totalHeight = isRectangle
     ? calc.wallHeight + calc.roofRadius
     : calc.domeHeight;
-  const footprint = isRectangle
-    ? Math.max(calc.length, calc.width)
+  const domeFootprint = isRectangle
+    ? Math.max(calc.length, calc.width) / 2
     : calc.radius;
 
-  const camDistance = Math.max(footprint, totalHeight) * 3.2;
+  // Person sits just outside the dome footprint on one axis;
+  // include its position + bounding radius so it's never clipped by the camera.
+  const personOffset = isRectangle
+    ? calc.width / 2 + PERSON_GAP
+    : calc.radius + PERSON_GAP;
+  const personReach = personOffset + PERSON_RADIUS;
+
+  // Combined bounding footprint/height (dome + person), centered on the origin.
+  const footprint = Math.max(domeFootprint, showPerson ? personReach : 0);
+  const sceneHeight = Math.max(totalHeight, showPerson ? PERSON_HEIGHT : 0);
+
+  const camDistance = Math.max(footprint, sceneHeight) * 3.2;
   const shadowExtent = Math.max(footprint * 2, 6);
+
+  // Orbit around the midpoint between the dome's center and the person,
+  // so the pair rotates together instead of the person swinging around alone.
+  const orbitTargetX = showPerson && !isRectangle ? personOffset / 2 : 0;
+  const orbitTargetZ = showPerson && isRectangle ? personOffset / 2 : 0;
 
   return (
     <>
@@ -273,13 +294,13 @@ function Scene({ calc, params }) {
               <planeGeometry args={[calc.length + 0.1, calc.width + 0.1]} />
               <meshBasicMaterial color="#001e2b" transparent opacity={0.15} />
             </mesh>
-            {params.showPerson !== false && <PersonScale x={0} z={calc.width / 2 + 0.6} height={2} />}
+            {showPerson && <PersonScale x={0} z={personOffset} height={PERSON_HEIGHT} />}
           </>
         ) : (
           <>
             <DomeMesh     radius={calc.radius} domeHeight={calc.domeHeight} />
             <BaseRing     radius={calc.radius} />
-            {params.showPerson !== false && <PersonScale x={calc.radius + 0.6} z={0} height={2} />}
+            {showPerson && <PersonScale x={personOffset} z={0} height={PERSON_HEIGHT} />}
           </>
         )}
       </group>
@@ -306,7 +327,7 @@ function Scene({ calc, params }) {
         minDistance={1}
         maxDistance={60}
         maxPolarAngle={Math.PI / 2 + 0.1}
-        target={[0, totalHeight / 2, 0]}
+        target={[orbitTargetX, totalHeight / 2, orbitTargetZ]}
       />
     </>
   );
