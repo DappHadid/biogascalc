@@ -1,6 +1,7 @@
 import Hero from '../components/sections/Hero';
 import About from '../components/sections/About';
 import Feature from '../components/sections/Feature';
+import DomeTypes from '../components/sections/DomeTypes';
 // import AboutReactor from '../components/sections/AboutReactor';
 import HowItWorks from '../components/sections/HowItWorks';
 import Faq from '../components/sections/Faq';
@@ -14,6 +15,7 @@ export default function Home() {
       <Hero />
       <About />
       <Feature />
+      <DomeTypes />
       {/* <AboutReactor /> */}
       <HowItWorks />
       <div style={{ backgroundColor: "#ffffff" }}>
