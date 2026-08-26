@@ -90,9 +90,9 @@ export default function Footer({ showCTA = true }) {
             }}
           >
             {/* Brand */}
-            <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }} aria-label="BioGasCalc beranda">
+            <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }} aria-label="Owren beranda">
               <img src="/Logo.png" alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} />
-              <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#171717", lineHeight: 1 }}>BioGasCalc</span>
+              <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#171717", lineHeight: 1 }}>Owren</span>
             </Link>
 
             {/* Link columns */}
@@ -142,7 +142,7 @@ export default function Footer({ showCTA = true }) {
 
           <div style={{ marginTop: 64, paddingTop: 24 }}>
             <p style={{ fontSize: "0.875rem", color: "rgba(23,23,23,0.5)", textAlign: "center" }}>
-              © {year} BioGasCalc. Hak cipta dilindungi undang-undang.
+              © {year} OWREN. Hak cipta dilindungi undang-undang.
             </p>
           </div>
         </div>

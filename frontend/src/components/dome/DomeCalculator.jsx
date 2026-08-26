@@ -87,6 +87,7 @@ export default function DomeCalculator() {
           }} onApply={() => setParams(draftParams)} user={user} onTrack={handleTrack}
             isCapped={draftIsCapped}
             onCapExceeded={() => setModal("volume-limit")}
+            maxVolume={maxVolume}
           />
         </div>
 

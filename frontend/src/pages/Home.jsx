@@ -5,10 +5,12 @@ import Feature from '../components/sections/Feature';
 import HowItWorks from '../components/sections/HowItWorks';
 import Faq from '../components/sections/Faq';
 import Footer from '../components/layouts/Footer';
+import VideoLoader from '../components/common/VideoLoader';
 
 export default function Home() {
   return (
     <div className="flex flex-col">
+      <VideoLoader />
       <Hero />
       <About />
       <Feature />
