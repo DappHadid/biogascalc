@@ -334,8 +334,13 @@ function Scene({ calc, params }) {
 }
 
 /* ── Main export ─────────────────────────────────────────────*/
-export default function DomeVisualizer({ calc, params }) {
+export default function DomeVisualizer({ calc, params, vizContainerRef }) {
   const containerRef = useRef(null);
+
+  const setRefs = (node) => {
+    containerRef.current = node;
+    if (vizContainerRef) vizContainerRef.current = node;
+  };
 
   // Fallback cleanup in case component unmounts while hovered
   useEffect(() => {
@@ -354,7 +359,7 @@ export default function DomeVisualizer({ calc, params }) {
 
   return (
     <div
-      ref={containerRef}
+      ref={setRefs}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{
@@ -369,7 +374,7 @@ export default function DomeVisualizer({ calc, params }) {
         touchAction: "none",
       }}
     >
-      <Canvas shadows gl={{ antialias: true, alpha: false }} style={{ background: "#f0f4f2" }}>
+      <Canvas shadows gl={{ antialias: true, alpha: false, preserveDrawingBuffer: true }} style={{ background: "#f0f4f2" }}>
         <Scene calc={calc} params={params} />
       </Canvas>
 
@@ -403,3 +408,4 @@ export default function DomeVisualizer({ calc, params }) {
     </div>
   );
 }
+

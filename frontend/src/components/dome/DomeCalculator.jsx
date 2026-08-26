@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDomeCalculations } from "../../hooks/useDomeCalculations";
 import { clampParamsToVolume } from "../../utils/volumeCap";
@@ -7,6 +7,7 @@ import DomeVisualizer   from "./DomeVisualizer";
 import StatsPanel       from "./StatsPanel";
 import MaterialsTable    from "./MaterialsTable";
 import LockedOverlay     from "./LockedOverlay";
+import DomePdfExport     from "./DomePdfExport";
 import LoginModal        from "../modals/LoginModal";
 import RegisterModal     from "../modals/RegisterModal";
 import VolumeLimitModal  from "../modals/VolumeLimitModal";
@@ -21,6 +22,9 @@ export default function DomeCalculator() {
   const [draftParams, setDraftParams] = useState(DEFAULT_PARAMS);
   const [params, setParams] = useState(DEFAULT_PARAMS);
   const [modal, setModal] = useState(null);
+  const [materialsConfig, setMaterialsConfig] = useState([]);
+
+  const vizContainerRef = useRef(null);
 
   useEffect(() => {
     api.get("/settings/volume-limits")
@@ -32,6 +36,12 @@ export default function DomeCalculator() {
       .finally(() => {
         setLimitsLoaded(true);
       });
+
+    api.get("/settings/dome-materials")
+      .then(({ data }) => {
+        if (data.success) setMaterialsConfig(data.data);
+      })
+      .catch(() => {});
   }, []);
 
   const maxVolume = user ? limits.user : limits.guest;
@@ -64,13 +74,22 @@ export default function DomeCalculator() {
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
 
       {/* ── Title row ── */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#00684a" }}>
-          Rancang Dome
-        </p>
-        <h1 style={{ fontSize: "1.375rem", fontWeight: 500, color: "#001e2b" }}>
-          3D Dome Visualizer
-        </h1>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: "#00684a" }}>
+            Rancang Dome
+          </p>
+          <h1 style={{ fontSize: "1.375rem", fontWeight: 500, color: "#001e2b" }}>
+            3D Dome Visualizer
+          </h1>
+        </div>
+        <DomePdfExport
+          user={user}
+          params={displayParams}
+          calc={cappedCalc}
+          canvasRef={vizContainerRef}
+          materialsConfig={materialsConfig}
+        />
       </div>
 
       {/* ── Main layout: 3-col desktop / stack mobile ── */}
@@ -96,7 +115,7 @@ export default function DomeCalculator() {
           className="order-1 lg:order-2"
           style={{ height: "clamp(400px, 65vh, 800px)", position: "sticky", top: 106 }}
         >
-          <DomeVisualizer calc={cappedCalc} params={displayParams} />
+          <DomeVisualizer calc={cappedCalc} params={displayParams} vizContainerRef={vizContainerRef} />
         </div>
 
         {/* ── RIGHT: Stats ── */}
@@ -118,7 +137,7 @@ export default function DomeCalculator() {
         onRegister={() => setModal("register")}
         message="Buat akun atau masuk untuk melihat estimasi bahan baku"
       >
-        <MaterialsTable calc={cappedCalc} params={displayParams} />
+        <MaterialsTable calc={cappedCalc} params={displayParams} materialsConfig={materialsConfig} />
       </LockedOverlay>
 
       <LoginModal open={modal === "login"} onClose={() => setModal(null)} onSwitchToRegister={() => setModal("register")} />
@@ -135,3 +154,4 @@ export default function DomeCalculator() {
     </div>
   );
 }
+

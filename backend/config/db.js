@@ -149,6 +149,16 @@ const syncDB = async () => {
           description: 'Admin contact email shown to users when volume limit is exceeded'
         });
       }
+      const materialsSetting = await models.AppSetting.findByPk('DOME_MATERIALS');
+      if (!materialsSetting) {
+        const { DEFAULT_DOME_MATERIALS } = require('../controllers/settingsController');
+        await models.AppSetting.create({
+          key: 'DOME_MATERIALS',
+          value: JSON.stringify(DEFAULT_DOME_MATERIALS),
+          description: 'Dome material estimation coefficients (JSON array)',
+        });
+        console.log('DOME_MATERIALS setting seeded successfully!');
+      }
     }
 
   } catch (error) {
